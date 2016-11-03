@@ -11,22 +11,26 @@ export class CategoryTest {
         console.log( this.category, this.category.path );
 
 
-
-
         if ( this.category.path == 'category' ) test.pass('success');
         else test.fail('path of cateogry is not category');
 
-        this.remove( () => 
+        this.destroy( () => 
             this.create( 'apple', 'red', () =>
                 this.create( 'banana', 'yellow', () =>
-                    this.create( 'cherry', 'darkred', () => {
-                        this.count( 3, callback )
-                    })
+                    this.create( 'cherry', 'darkred', () =>
+                        this.count( 3, () =>
+                            this.delete( 'banana', () => 
+                                this.count( 2, () =>
+                                    this.update('apple', callback )
+                                )
+                            )
+                        )
+                    )
                 )
             )
         );
     }
-    remove( callback ) {
+    destroy( callback ) {
         this.category.destroy( () => {
             test.pass('reset category stroage');
             callback();
@@ -34,6 +38,15 @@ export class CategoryTest {
             test.fail( e );
             callback();
         });
+    }
+    delete( key, callback ) {
+        this.category.delete( key, () => {
+            test.pass('deleted: ' + key );
+            callback();
+        }, e => {
+            test.fail('failed to delete: ' + key );
+            callback();
+        })
     }
 
     create( name, color, callback ) {
@@ -61,7 +74,18 @@ export class CategoryTest {
             test.fail('failed to query');
             callback();
         })
+    }
 
+    update( key, callback ) {
+        this.category.set( 'key', key );
+        this.category.set( 'name', key + ' : updated on ' + new Date().getTime());
+        this.category.update( re => {
+            test.pass( key + ' updated');
+            callback();
+        }, e => {
+            test.fail( key + ' update fail');
+            callback();
+        });
     }
 
 

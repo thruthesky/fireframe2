@@ -97,5 +97,30 @@ export class FireframeBase {
     }
 
     // update
+    update( successCallback, failureCallback ) {
+        let data = (JSON.parse(JSON.stringify( this.data )));
+        this.clear();
+        // @todo data validation. check if key exists in this.data and in server. check if data exists.
+        let key = data.key;
+        delete data.key;
+        let ref = this.object.$ref;
+        ref.child( key )
+            .update( data, re => {
+                if ( re == null ) successCallback();
+                else failureCallback( re );
+            } )
+            .catch( e => failureCallback( e.message ) );
+    }
+
     // delete
+    delete( key, successCallback, failureCallback ) {
+        this.get( key, re => {
+            if ( re == null ) return failureCallback( 'key does not exist' );
+            let ref = this.object.$ref;
+            ref.child(key).remove()
+                .then( successCallback )
+                .catch( e => failureCallback( e ) );
+        }, e => failureCallback( e ) );
+    }
+
 }
