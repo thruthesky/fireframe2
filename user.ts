@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Fireframe } from './fireframe';
 import { FireframeBase } from './fireframe-base';
 import { FirebaseAuth, AuthProviders, AuthMethods } from 'angularfire2';
-import * as firebase from 'firebase';
 
 @Injectable()
 export class User extends FireframeBase {
@@ -17,6 +16,7 @@ export class User extends FireframeBase {
     }
 
 
+
     /**
      * returns firebase.User or null
      */
@@ -24,7 +24,7 @@ export class User extends FireframeBase {
         return this.currentUser;
     }
     logged() {
-        return this.current();
+        return !! this.current();
     }
 
     set( key:string, value:string) : User {
@@ -60,7 +60,7 @@ export class User extends FireframeBase {
             .then((authData) => {
                 this.clear();
                 this.currentUser = authData;
-                successCallback();
+                successCallback( authData );
             })
             .catch( e => {
                 this.clear();
