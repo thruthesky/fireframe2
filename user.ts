@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Fireframe } from './fireframe';
 import { FireframeBase } from './fireframe-base';
 import { FirebaseAuth, AuthProviders, AuthMethods } from 'angularfire2';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 
 @Injectable()
 export class User extends FireframeBase {
@@ -92,5 +92,10 @@ export class User extends FireframeBase {
         }, e => failureCallback('get sysn error: ' + e)); // sync error on getting data.
     }
     // delete
+
+    delete( successCallback , failureCallback){
+            
+
+    }
 
 }

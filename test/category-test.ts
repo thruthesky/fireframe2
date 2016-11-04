@@ -21,15 +21,15 @@ export class CategoryTest {
                         this.count( 3, () =>
                             this.delete( 'banana', () => 
                                 this.count( 2, () =>
-                                    this.update('apple', callback )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
-    }
+                                    this.update('apple', () =>
+                                        this.get('apple', () =>
+                                           this.getNonExistKey( () =>
+                                              this.gets( () =>
+                                                  this.count( 2, callback
+                                                      ))))))))))));            
+         }
+
+
     destroy( callback ) {
         this.category.destroy( () => {
             test.pass('reset category stroage');
@@ -39,6 +39,43 @@ export class CategoryTest {
             callback();
         });
     }
+
+    gets( callback ){    
+        this.category.gets( s =>{
+          if(s) test.pass('gets(): result : ' + JSON.stringify(s)); 
+          else  test.fail('failed to gets(): should not return :' + s );
+            callback();
+        }, e =>{
+            test.fail('failed to gets(): error ' + e );
+            callback();
+        });
+
+    }
+
+
+    getNonExistKey( callback){
+        this.category.get("notexist", s=>{
+            if(s) test.fail('get: non existing key ');
+            else  test.pass(' get: fail to get non existing key. result is: ' + s );
+            callback();
+        },e=>{
+            test.fail('failed to getNonExisting error:' + e);
+            callback();
+        });
+    }
+
+    get(key, callback){
+        this.category.get(key, s=>{
+           if(s)  test.pass('get: ' + key + ": " + JSON.stringify(s));
+           else  test.fail('failed to get:' + key );
+            callback();
+        },e=>{
+            test.fail('failed to get: error ' + e );
+            callback();
+        });
+
+    }
+
     delete( key, callback ) {
         this.category.delete( key, () => {
             test.pass('deleted: ' + key );
@@ -87,6 +124,9 @@ export class CategoryTest {
             callback();
         });
     }
+
+
+
 
 
 }
