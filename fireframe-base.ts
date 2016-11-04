@@ -42,28 +42,34 @@ export class FireframeBase {
         return this;
     }
 
+    /**
+     * 
+     */
     create( successCallback, failureCallback ) {
-        let data = (JSON.parse(JSON.stringify( this.data )));
-        this.clear();
 
-
+        let data = this.data;
         if ( data.key === void 0 ) { // push the data ( push a key and then set )
             this.list
                 .push( data )
-                .then( successCallback )
-                .catch( e => failureCallback(e) );
+                .then( () => { this.clear(); successCallback(); } )
+                .catch( e => { this.clear(); failureCallback(e); } );
         }
         else { // set the data
             let key = data.key;
             delete data.key;
             this.getChildObject( key )
                 .set( data )
-                .then( successCallback )
-                .catch( e => failureCallback(e) );
+                .then( () => { this.clear(); successCallback(); } )
+                .catch( e => {
+                    this.clear();
+                    failureCallback(e);
+                } );
         }
     }
     getChildObject( child_path: string ) {
-        return this.af.database.object( '/' + this.path + '/' + child_path );
+        let path: string =  '/' + this.path + '/' + child_path;
+        console.log('FireframeBase::getChildObject() path: ', path);
+        return this.af.database.object( path );
     }
 
 
@@ -74,6 +80,10 @@ export class FireframeBase {
     }
 
 
+    /**
+     * 
+     * @Warning it will pass 'null' if the key does not exsits. This is the nature of firebase.
+     */
     get( key, successCallback, failureCallback ) {
         let ref = this.object.$ref.child(key);
         ref.once('value', snapshot => {
@@ -98,20 +108,32 @@ export class FireframeBase {
         }, failureCallback );
     }
 
-    // update
+    /**
+     * update must(should) only update. no create.
+     */
     update( successCallback, failureCallback ) {
+
         let data = (JSON.parse(JSON.stringify( this.data )));
         this.clear();
-        // @todo data validation. check if key exists in this.data and in server. check if data exists.
+
         let key = data.key;
-        delete data.key;
-        let ref = this.object.$ref;
-        ref.child( key )
-            .update( data, re => {
-                if ( re == null ) successCallback();
-                else failureCallback( re );
-            } )
-            .catch( e => failureCallback( e.message ) );
+
+        // @todo data validation. check if key exists in this.data and in server. check if data exists.
+
+        this.get( key, re => {   // yes, key exists on server, so you can update.
+            if ( re == null ) return failureCallback('key does not exists');
+            delete data.key;
+            let ref = this.object.$ref;
+            ref.child( key )
+                .update( data, re => {
+                    this.clear();
+                    if ( re == null ) successCallback();
+                    else failureCallback( re );
+                } )
+                .catch( e => failureCallback( e.message ) );
+        }, e => failureCallback('sync failed: ' + e) );
+
+
     }
 
     // delete
