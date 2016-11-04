@@ -5,7 +5,9 @@
  * And this is why we have FireframeBase.
  * It is more likely a proxy between fireframe and indivisual classes.
  */
-import { AngularFire, FirebaseObjectObservable, FirebaseListObservable } from 'angularfire2';
+import {
+    AngularFire, FirebaseObjectObservable, FirebaseListObservable,
+    } from 'angularfire2';
 import { Fireframe } from './fireframe';
 export class FireframeBase {
     private f: Fireframe;
@@ -122,5 +124,8 @@ export class FireframeBase {
                 .catch( e => failureCallback( e ) );
         }, e => failureCallback( e ) );
     }
+
+
+    
 
 }

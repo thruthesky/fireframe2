@@ -5,6 +5,8 @@ import { Category } from './category';
 import { CategoryTest } from './test/category-test';
 import { Post } from './post';
 import { PostTest } from './test/post-test';
+import { User } from './user';
+import { UserTest } from './test/user-test';
 
 let firebaseConfig = {
     apiKey: "AIzaSyD_qAm3uzodD-Ea_hoDw_Dr0daMOcAi9uQ",
@@ -19,6 +21,6 @@ let firebaseConfig = {
   imports: [
     AngularFireModule.initializeApp(firebaseConfig)
   ],
-  providers: [ Fireframe, Category, CategoryTest, Post, PostTest ]
+  providers: [ Fireframe, Category, User, CategoryTest, Post, PostTest, UserTest ]
 })
 export class FireModule {}
