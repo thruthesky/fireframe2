@@ -21,15 +21,31 @@ export class CategoryTest {
                         this.count( 3, () =>
                             this.delete( 'banana', () => 
                                 this.count( 2, () =>
-                                    this.update('apple', callback )
-                                )
+                                    this.update('apple', () =>
+                                        this.get('apple', () =>
+                                           this.getNonExistKey( () =>
+                                              this.gets( () =>
+                                                  this.count( 2, () =>
+                                                    this.set("key", "cherry", () =>
+                                                      this.sets( ()=>
+                                                        this.clear(callback)
+                                                      )
+                                                    )
+                                                  )          
+                                              )
+                                           )
+                                        )
+                                     )
+                                  )
+                               )
                             )
                         )
                     )
                 )
-            )
-        );
-    }
+                                                      );            
+         }
+
+
     destroy( callback ) {
         this.category.destroy( () => {
             test.pass('reset category stroage');
@@ -39,6 +55,51 @@ export class CategoryTest {
             callback();
         });
     }
+
+    gets( callback ){    
+        this.category.gets( s =>{
+          if(s) test.pass('gets(): result : ' + JSON.stringify(s)); 
+          else  test.fail('failed to gets(): should not return :' + s );
+            callback();
+        }, e =>{
+            test.fail('failed to gets(): error ' + e );
+            callback();
+        });
+
+    }
+
+  
+   clear(callback){
+       this.category.clear();
+
+       if(this.category.data['key'] == undefined) test.pass("clear : data is cleared");
+       else test.fail("clear: data not cleared");
+       callback();
+   }
+
+    getNonExistKey( callback){
+        this.category.get("notexist", s=>{
+            if(s) test.fail('get: non existing key ');
+            else  test.pass(' get: fail to get non existing key. result is: ' + s );
+            callback();
+        },e=>{
+            test.fail('failed to getNonExisting error:' + e);
+            callback();
+        });
+    }
+
+    get(key, callback){
+        this.category.get(key, s=>{
+           if(s)  test.pass('get: ' + key + ": " + JSON.stringify(s));
+           else  test.fail('failed to get:' + key );
+            callback();
+        },e=>{
+            test.fail('failed to get: error ' + e );
+            callback();
+        });
+
+    }
+
     delete( key, callback ) {
         this.category.delete( key, () => {
             test.pass('deleted: ' + key );
@@ -76,6 +137,36 @@ export class CategoryTest {
         })
     }
 
+    sets(callback){
+        let data : any = {};
+            data["key"] = "Cherry";
+            data['name'] = "Blossom";
+
+            this.category.sets(data);
+
+            let key = this.category.data['key'];
+            let name = this.category.data['name'];
+            let categoryData = JSON.stringify(this.category.data);
+            let sampleData = JSON.stringify(data);
+
+            if(key==="Cherry"
+             && name === 'Blossom'
+             && categoryData === sampleData)
+             test.pass("Sets success on :" + JSON.stringify(data));    
+             else  test.fail("Fail sets() on :" + JSON.stringify(data));  
+             callback();             
+    }
+
+
+    set(key,value, callback){
+        this.category.set(key,value);
+        if( this.category.data[ key ] === value) test.pass("set:key:"+ key + " : "+ value);     
+        else test.fail("fail to set : "+ key + ":"+ value); 
+        callback();                
+    }
+    
+
+
     update( key, callback ) {
         this.category.set( 'key', key );
         this.category.set( 'name', key + ' : updated on ' + new Date().getTime());
@@ -87,6 +178,9 @@ export class CategoryTest {
             callback();
         });
     }
+
+
+
 
 
 }

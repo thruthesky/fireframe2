@@ -4,8 +4,12 @@ fireframe version 2
 
 # TODO List
 
+    * merge webapp/providers/app into fireframe2
+
     * user resign with deleting user data in database.
     * add more tests. 20 tests on category, 20 tests on user. 30 test on post.
+
+
 
 
 # install

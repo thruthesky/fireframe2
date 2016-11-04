@@ -9,11 +9,11 @@ import { User } from './user';
 import { UserTest } from './test/user-test';
 
 let firebaseConfig = {
-    apiKey: "AIzaSyD_qAm3uzodD-Ea_hoDw_Dr0daMOcAi9uQ",
-    authDomain: "ionicafire2-2d83c.firebaseapp.com",
-    databaseURL: "https://ionicafire2-2d83c.firebaseio.com",
-    storageBucket: "ionicafire2-2d83c.appspot.com",
-    messagingSenderId: "107650475664"
+    apiKey: "AIzaSyDgVNWHWVRogTbKvTftNoNv7cSmtFaAfz0",
+    authDomain: "fir-app-f2d67.firebaseapp.com",
+    databaseURL: "https://fir-app-f2d67.firebaseio.com",
+    storageBucket: "fir-app-f2d67.appspot.com",
+    messagingSenderId: "552188619868"
 };
 
 
