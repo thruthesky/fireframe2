@@ -25,8 +25,24 @@ export class CategoryTest {
                                         this.get('apple', () =>
                                            this.getNonExistKey( () =>
                                               this.gets( () =>
-                                                  this.count( 2, callback
-                                                      ))))))))))));            
+                                                  this.count( 2, () =>
+                                                    this.set("key", "cherry", () =>
+                                                      this.sets( ()=>
+                                                        this.clear(callback)
+                                                      )
+                                                    )
+                                                  )          
+                                              )
+                                           )
+                                        )
+                                     )
+                                  )
+                               )
+                            )
+                        )
+                    )
+                )
+                                                      );            
          }
 
 
@@ -52,6 +68,14 @@ export class CategoryTest {
 
     }
 
+  
+   clear(callback){
+       this.category.clear();
+
+       if(this.category.data['key'] == undefined) test.pass("clear : data is cleared");
+       else test.fail("clear: data not cleared");
+       callback();
+   }
 
     getNonExistKey( callback){
         this.category.get("notexist", s=>{
@@ -112,6 +136,36 @@ export class CategoryTest {
             callback();
         })
     }
+
+    sets(callback){
+        let data : any = {};
+            data["key"] = "Cherry";
+            data['name'] = "Blossom";
+
+            this.category.sets(data);
+
+            let key = this.category.data['key'];
+            let name = this.category.data['name'];
+            let categoryData = JSON.stringify(this.category.data);
+            let sampleData = JSON.stringify(data);
+
+            if(key==="Cherry"
+             && name === 'Blossom'
+             && categoryData === sampleData)
+             test.pass("Sets success on :" + JSON.stringify(data));    
+             else  test.fail("Fail sets() on :" + JSON.stringify(data));  
+             callback();             
+    }
+
+
+    set(key,value, callback){
+        this.category.set(key,value);
+        if( this.category.data[ key ] === value) test.pass("set:key:"+ key + " : "+ value);     
+        else test.fail("fail to set : "+ key + ":"+ value); 
+        callback();                
+    }
+    
+
 
     update( key, callback ) {
         this.category.set( 'key', key );

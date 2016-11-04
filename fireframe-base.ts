@@ -66,6 +66,8 @@ export class FireframeBase {
                 } );
         }
     }
+
+    
     getChildObject( child_path: string ) {
         let path: string =  '/' + this.path + '/' + child_path;
         console.log('FireframeBase::getChildObject() path: ', path);
