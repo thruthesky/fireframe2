@@ -1,0 +1,61 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-row>
+      <ion-col width-10><ion-icon name="home" (click)="onClickHome()"></ion-icon></ion-col>
+      <ion-col><ion-title>Register Login</ion-title></ion-col>
+    </ion-row>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <section *ngIf=" loginData ">
+    <div warning>
+      You are logged in as "{{ loginData.email }}" already !
+      <button ion-button (click)="onClickLogout()">LOGOUT</button>
+    </div>
+  </section>
+  <section *ngIf=" ! loginData ">
+    <ion-list>
+      <ion-item>
+        <ion-label floating>Input Email</ion-label>
+        <ion-input [(ngModel)]="data.email"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Password</ion-label>
+        <ion-input [(ngModel)]="data.password"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Name</ion-label>
+        <ion-input [(ngModel)]="data.name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Mobile</ion-label>
+        <ion-input [(ngModel)]="data.mobile"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Address</ion-label>
+        <ion-input [(ngModel)]="data.address"></ion-input>
+      </ion-item>
+
+      <div *ngIf=" progress ">
+        <ion-spinner name="bubbles"></ion-spinner>
+        {{ progress }}
+      </div>
+      <div *ngIf=" error ">
+        {{ error }}
+      </div>
+
+      <button ion-button (click)="onClickRegister()">REGISTER</button>
+      <button ion-button (click)="onClickCancel()">CANCEL</button>
+    </ion-list>
+  </section>
+
+</ion-content>

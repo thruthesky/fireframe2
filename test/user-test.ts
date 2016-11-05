@@ -13,7 +13,11 @@ export class UserTest {
         let id = 'user-no-4';
         this.login( id, id, x => {
             this.update( id, x => {
-
+                this.logout( x => {
+                    this.logoutUpdate( id, x => {
+                        callback()
+                    });
+                })
             })
         });
 
@@ -54,6 +58,9 @@ export class UserTest {
                 callback();
             });
     }
+    logout( callback ) {
+        this.user.logout( callback );
+    }
     update( id, callback ) {
         this.user
             .set('name', 'Name: ' + id )
@@ -64,7 +71,17 @@ export class UserTest {
                 test.pass('updated');
                 callback();
             }, e => {
-                test.fail('failed on update: ' + e );
+                test.fail( id + ' - failed on update: ' + e );
+                callback();
+            });
+    }
+    logoutUpdate( id, callback ) {
+        this.user.set('name', 'wrong update. the user logged out')
+            .update( () => {
+                test.fail('user logged out already. should not be able to update');
+                callback();
+            }, e => {
+                test.pass('User cannot update since he logged out');
                 callback();
             });
     }
