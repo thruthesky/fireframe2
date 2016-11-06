@@ -52,7 +52,7 @@ export class FireframeBase {
         let data = _.cloneDeep(this.data);
         this.clear();
         if ( data.key === void 0 ) { // push the data ( push a key and then set )
-            console.log('No key. Goint to push()');
+            console.log('No key. Going to push()');
             this.list
                 .push( data )
                 .then( () => { successCallback(); } )
@@ -61,7 +61,7 @@ export class FireframeBase {
         else { // set the data
             let key = data.key;
             delete data.key;
-            console.log('Key exists. Goint to set() with key : ' + key);
+            console.log('Key exists. Going to set() with key : ' + key);
             console.log('FireframeBase::create() data: ', data);
             this.list
             this.getChildObject( key )
@@ -124,6 +124,7 @@ export class FireframeBase {
      */
     update( successCallback: () => void, failureCallback: (e: string) => void ) {
 
+        console.log("FireframeBase::update() : this.data : ", this.data);
         if ( _.isEmpty( this.data )) return failureCallback('data is empty');
 
         let data = _.cloneDeep(this.data);
@@ -136,6 +137,7 @@ export class FireframeBase {
         this.get( key, re => {   // yes, key exists on server, so you can update.
             if ( re == null ) return failureCallback('key does not exists');
             delete data.key;
+            console.log("Going to update: data : ", data);
             this.getChild( key )
                 .update( data, re => {
                     if ( re == null ) successCallback();

@@ -164,8 +164,6 @@ export class CategoryTest {
         else test.fail("fail to set : "+ key + ":"+ value); 
         callback();                
     }
-    
-
 
     update( key, callback ) {
         this.category.set( 'key', key );

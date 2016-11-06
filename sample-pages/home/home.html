@@ -7,8 +7,17 @@
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+  <section *ngIf=" login ">
+    <div warning>
+      You are logged in as "{{ loginData.email }}" already !
+    </div>
+      <button ion-button (click)="onClickLogout()">LOGOUT</button>
+      <button ion-button (click)="onClickProfile()">UPDATE PROFILE</button>
+      <button ion-button (click)="onClickResign()">RESIGN</button>
+  </section>
+
+  <section *ngIf=" ! login ">
+    <button ion-button (click)="onClickLogin()">LOGIN</button>
+    <button ion-button (click)="onClickRegister()">REGISTER</button>
+  </section>
 </ion-content>

@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { Fireframe } from './fireframe';
 import { FireframeBase } from './fireframe-base';
 import { FirebaseAuth, AuthProviders, AuthMethods } from 'angularfire2';
+import * as _ from 'lodash';
 
 // --------------- Const ------------
 export const KEY_USER_DATA = 'user.data';
@@ -45,19 +46,34 @@ export class User extends FireframeBase {
             .get( KEY_USER_DATA )
             .then( callback );
     }
-    loggedIn( yesCallback: (userData: USER_DATA) => void, noCallback ) {
-        console.log('User::loggedIn()');
+    /**
+     * Check if the user logged in already.
+     * 
+     * @note use this method to check if the user has already logged in.
+     * @note User login information is delivered to callback.
+     * 
+     * @code - Recommended way to use.
+            user.loggedIn( u => this.loginData = u, () => this.loginData = null );
+            <section *ngIf=" loginData "> ... </section>
+            <section *ngIf=" ! loginData "> ... </section>
+     * @endcode
+     * 
+     */
+    loggedIn( yesCallback: (userData: USER_DATA) => void, noCallback: (error?: string) => void ) {
         this.getLoginData( ( re ) => {
             console.log("User::loggedIn() getLoginData() callback: re: ", re);
             if ( re == null || re == '' ) return noCallback();
             try {
                 let data: USER_DATA = JSON.parse( re );
-                console.log('User::loggedIn()::getLoginData():: has data.', data);
                 if ( data == null ) return noCallback();
-                if ( data.email !== void 0 ) yesCallback( data );
+                if ( data.email !== void 0 ) {
+                    console.log('User::loggedIn()::getLoginData():: has data.', data);
+                    yesCallback( data );
+                }
                 else noCallback();
             }
             catch ( e ) {
+                console.log('User::loggedIn() data error');
                 noCallback( e );
             }
         });
@@ -67,9 +83,6 @@ export class User extends FireframeBase {
             .remove( KEY_USER_DATA )
             .then( callbcak );
     }
-
-
-
     set( key:string, value:string) : User {
         super.set( key, value );
         return this;
@@ -94,6 +107,10 @@ export class User extends FireframeBase {
             });
     }
 
+    /**
+     * 
+     * @attention it clears this.data after login or fail.
+     */
     login( successCallback:(userData:USER_DATA)=>void, failureCallback:(error:string)=>void) {
         console.log('User::login() data: ', this.data);
         if ( this.data.email === void 0 ) return failureCallback( 'no email provided' );
@@ -124,7 +141,8 @@ export class User extends FireframeBase {
      * @note if the key of user profile data on database, it create a dummy profile with the key, so the next update call will work.
      */
     update( successCallback: () => void, failureCallback: (e:string) => void ) {
-        console.log('User::update()');
+        let data = _.clone( this.data ); // @attention backup this.data
+        console.log('User::update() : data : ', data);
         this.loggedIn( ( user : USER_DATA ) => {
             if ( user.uid === void 0 || user.uid == null ) return failureCallback('input uid');
             let key = user.uid;
@@ -134,9 +152,10 @@ export class User extends FireframeBase {
                 console.log('User::update() get() re: ', re);
                 if ( re == null ) { // key does not exist.
                     console.log('User info does not exist in DB. Going to create a new info.');
-                    super.create( () => { // create one
+                    super.create( () => { // create one. @Warnign this.data is now empty.
                         successCallback();
-                        //super.update( successCallback, e => failureCallback('update sync error after create: ' + e) ); // update
+                        this.sets(data).set('key', key); // @note set key again
+                        super.update( successCallback, e => failureCallback('update sync error after create: ' + e) ); // update
                     }, e => failureCallback( 'Create sysn error: ' + e) ); // sync error
                 }
                 else super.update( successCallback, e => failureCallback('key exists but update sysn error: ' + e) ); // key already exsit, update
@@ -144,6 +163,24 @@ export class User extends FireframeBase {
         }, () => {
             failureCallback('user not logged in');
         });
+    }
+    register( successCallback: () => void, failureCallback: (e: string) => void ) {
+        console.log("User::register() this.data : ", this.data);
+        let data = _.clone( this.data ); // back for re-use on login & update
+        console.log("User::register() data : ", data);
+        this.create( () => {
+            console.log("Create OK: this.data: ", this.data);
+            this.sets(data).login( userData => {
+                console.log('login ok: Data from Stroage: ', userData);
+                data.uid = userData.uid;
+                delete data.password;
+                console.log("login OK: data: ", data);
+                this.sets(data).update( () => {
+                    console.log('User update success');
+                    successCallback();
+                }, failureCallback)
+            }, failureCallback)
+        }, failureCallback);
     }
     // delete
 

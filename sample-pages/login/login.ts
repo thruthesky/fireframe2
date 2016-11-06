@@ -19,19 +19,15 @@ export class LoginPage {
     private user: User
     ) {
       console.log('LoginPage::constructor()');
-
-      this.checkUserLogin();
+      this.checkLogin();
+  }
+  get login() {
+    return !! this.loginData;
+  }
+  checkLogin() {
+      this.user.loggedIn( u => this.loginData = u, () => this.loginData = null );
   }
 
-  checkUserLogin() {
-      this.user.loggedIn( ( user: USER_DATA ) => {
-        console.log('Yes, user has logged in as : ' + user.email );
-        this.loginData = user;
-      }, () => {
-        console.log('No, user not logged in');
-        this.loginData = null;
-      });
-  }
   ionViewDidLoad() {
   }
 
@@ -49,7 +45,7 @@ export class LoginPage {
       .login( re => {
         console.log('login success : user has logged in? re: ', re);
         this.progress = null;
-        this.checkUserLogin();
+        this.checkLogin();
       }, e => {
         // alert( 'Login Error: ' + e );
         this.progress = null;
@@ -57,7 +53,7 @@ export class LoginPage {
       } );
   }
   onClickLogout() {
-    this.user.logout( () => this.checkUserLogin() );
+    this.user.logout( () => this.checkLogin() );
   }
   onClickRegister() {
     console.log('onClickRegister()');

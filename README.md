@@ -6,6 +6,7 @@ fireframe version 2
 
     * user password update & email address update
     * user resign with deleting user data in database.
+    * photo upload
     * add more tests. 20 tests on category, 20 tests on user. 30 test on post.
 
 
@@ -39,5 +40,35 @@ How to test...
 * 'USER_DATA' interface has User login, register interface.
   if you need to as more property on 'USER_DATA', you can extend it.
   @see sample-pages/register
+
+
+### User login check and user data
+
+Below are one way to use user code.
+
+````
+
+  user.loggedIn( u => this.loginData = u, () => this.loginData = null );
+  get login() {
+      return !! this.loginData;
+  }
+  <section *ngIf=" login ">...</section>
+  <ion-item *ngIf=" ! login ">...</ion-item>
+
+````
+
+Or you can do something like Below
+
+````
+
+    this.checkLogin();
+    checkLogin() {
+        this.user.loggedIn( u => this.loginData = u, () => this.loginData = null );
+    }
+
+````
+
+
+
 
 

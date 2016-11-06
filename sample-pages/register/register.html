@@ -3,7 +3,7 @@
   <ion-navbar>
     <ion-row>
       <ion-col width-10><ion-icon name="home" (click)="onClickHome()"></ion-icon></ion-col>
-      <ion-col><ion-title>Register Login</ion-title></ion-col>
+      <ion-col><ion-title>Member Registration</ion-title></ion-col>
     </ion-row>
   </ion-navbar>
 
@@ -11,21 +11,20 @@
 
 
 <ion-content padding>
+  {{ loginData | json }}
 
-  <section *ngIf=" loginData ">
+  <section *ngIf=" login ">
     <div warning>
-      You are logged in as "{{ loginData.email }}" already !
-      <button ion-button (click)="onClickLogout()">LOGOUT</button>
+      Welcome, {{ loginData.email }}
     </div>
   </section>
-  <section *ngIf=" ! loginData ">
     <ion-list>
-      <ion-item>
+      <ion-item *ngIf=" ! login ">
         <ion-label floating>Input Email</ion-label>
         <ion-input [(ngModel)]="data.email"></ion-input>
       </ion-item>
 
-      <ion-item>
+      <ion-item *ngIf=" ! login ">
         <ion-label floating>Input Password</ion-label>
         <ion-input [(ngModel)]="data.password"></ion-input>
       </ion-item>
@@ -56,9 +55,9 @@
         {{ result }}
       </div>
 
-      <button ion-button (click)="onClickRegister()">REGISTER</button>
+      <button *ngIf=" ! login " ion-button (click)="onClickRegister()">REGISTER</button>
+      <button *ngIf=" login " ion-button (click)="onClickUpdate()">UPDATE</button>
       <button ion-button (click)="onClickCancel()">CANCEL</button>
     </ion-list>
-  </section>
 
 </ion-content>

@@ -18,13 +18,13 @@
 
 <ion-content padding>
 
-  <section *ngIf=" loginData ">
+  <section *ngIf=" login ">
     <div warning>
       You are logged in as "{{ loginData.email }}" already !
-      <button ion-button (click)="onClickLogout()">LOGOUT</button>
     </div>
+      <button ion-button (click)="onClickLogout()">LOGOUT</button>
   </section>
-  <section *ngIf=" ! loginData ">
+  <section *ngIf=" ! login ">
     <ion-list>
       <ion-item>
         <ion-label floating>Input Email</ion-label>
