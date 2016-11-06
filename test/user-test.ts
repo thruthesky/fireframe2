@@ -38,7 +38,7 @@ export class UserTest {
         this.user
             .set('email', name + '@gmail.com')
             .set('password', name )
-            .create( re => {
+            .create( () => {
                 test.pass('registeration success');
                 callback();
             }, e => {

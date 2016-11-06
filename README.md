@@ -15,6 +15,7 @@ fireframe version 2
 # install
 
 npm install firebase angularfire2 --save
+npm install lodash --save
 
 
 
@@ -30,5 +31,13 @@ How to test...
   );
 //  this.userTest.test( () => {} );
 
+
+# USER
+
+## Basic User Data
+
+* 'USER_DATA' interface has User login, register interface.
+  if you need to as more property on 'USER_DATA', you can extend it.
+  @see sample-pages/register
 
 

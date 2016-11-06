@@ -31,7 +31,7 @@ export class User extends FireframeBase {
     /**
      * Saves user data.
      */
-    setLoginData( data: USER_DATA, callback? ) {
+    setLoginData( data: USER_DATA, callback?: () => void ) {
         console.log('User::setLoginData() data : ', data);
         this.storage
             .set( KEY_USER_DATA, JSON.stringify( data ) )
@@ -40,12 +40,12 @@ export class User extends FireframeBase {
     /**
      * Gets user data
      */
-    getLoginData( callback ) {
+    getLoginData( callback: (userData:string) => void ) {
         this.storage
             .get( KEY_USER_DATA )
             .then( callback );
     }
-    loggedIn( yesCallback, noCallback ) {
+    loggedIn( yesCallback: (userData: USER_DATA) => void, noCallback ) {
         console.log('User::loggedIn()');
         this.getLoginData( ( re ) => {
             console.log("User::loggedIn() getLoginData() callback: re: ", re);
@@ -62,7 +62,7 @@ export class User extends FireframeBase {
             }
         });
     }
-    logout( callbcak ) {
+    logout( callbcak: () => void ) {
         this.storage
             .remove( KEY_USER_DATA )
             .then( callbcak );
@@ -78,7 +78,7 @@ export class User extends FireframeBase {
         super.sets( data );
         return this;
     }
-    create( successCallback, failureCallback ) {
+    create( successCallback: () => void , failureCallback: (e: string) => void ) {
         console.log('User::create() data: ', this.data);
         if ( this.data.email === void 0 ) return failureCallback( 'no email provided' );
         if ( this.data.password === void 0 ) return failureCallback( 'no password provided' );
@@ -90,11 +90,11 @@ export class User extends FireframeBase {
             })
             .catch( e => {
                 this.clear();
-                failureCallback( e );
+                failureCallback( e.message );
             });
     }
 
-    login( successCallback, failureCallback ) {
+    login( successCallback:(userData:USER_DATA)=>void, failureCallback:(error:string)=>void) {
         console.log('User::login() data: ', this.data);
         if ( this.data.email === void 0 ) return failureCallback( 'no email provided' );
         if ( this.data.password === void 0 ) return failureCallback( 'no password provided' );
@@ -113,7 +113,7 @@ export class User extends FireframeBase {
             })
             .catch( e => {
                 this.clear();
-                failureCallback( e );
+                failureCallback( e.message );
             } );
     }
 
@@ -123,19 +123,21 @@ export class User extends FireframeBase {
      * Updates user profile.
      * @note if the key of user profile data on database, it create a dummy profile with the key, so the next update call will work.
      */
-    update( successCallback, failureCallback ) {
+    update( successCallback: () => void, failureCallback: (e:string) => void ) {
         console.log('User::update()');
         this.loggedIn( ( user : USER_DATA ) => {
+            if ( user.uid === void 0 || user.uid == null ) return failureCallback('input uid');
             let key = user.uid;
-            this.set('key', key).set('uid', key);
+            this.set('key', key).set('uid', key); // @Warning this.data is already set hereby. It is olnly adding key.
             console.log('User::update() currentUser : ', user, key );
             this.get( key, re => { // get data to check if it exists.
                 console.log('User::update() get() re: ', re);
                 if ( re == null ) { // key does not exist.
-                    console.log('User::update() get callback() : key does not exist');
-                    super.create( re => { // create one
-                        super.update( successCallback, e => failureCallback('update sync error after crate: ' + e) ); // update
-                    }, e => failureCallback( 'create sysn error: ' + e) ); // sync error
+                    console.log('User info does not exist in DB. Going to create a new info.');
+                    super.create( () => { // create one
+                        successCallback();
+                        //super.update( successCallback, e => failureCallback('update sync error after create: ' + e) ); // update
+                    }, e => failureCallback( 'Create sysn error: ' + e) ); // sync error
                 }
                 else super.update( successCallback, e => failureCallback('key exists but update sysn error: ' + e) ); // key already exsit, update
             }, e => failureCallback('get sysn error: ' + e)); // sync error on getting data.
