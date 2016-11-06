@@ -170,7 +170,7 @@ export class CategoryTest {
     update( key, callback ) {
         this.category.set( 'key', key );
         this.category.set( 'name', key + ' : updated on ' + new Date().getTime());
-        this.category.update( re => {
+        this.category.update( () => {
             test.pass( key + ' updated');
             callback();
         }, e => {

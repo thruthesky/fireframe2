@@ -45,12 +45,15 @@
         <ion-input [(ngModel)]="data.address"></ion-input>
       </ion-item>
 
-      <div *ngIf=" progress ">
+      <div progress *ngIf=" progress ">
         <ion-spinner name="bubbles"></ion-spinner>
         {{ progress }}
       </div>
-      <div *ngIf=" error ">
+      <div warning *ngIf=" error ">
         {{ error }}
+      </div>
+      <div result *ngIf=" result ">
+        {{ result }}
       </div>
 
       <button ion-button (click)="onClickRegister()">REGISTER</button>

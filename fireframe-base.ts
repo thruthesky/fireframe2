@@ -49,13 +49,14 @@ export class FireframeBase {
     create( successCallback: () => void, failureCallback: (e: string) => void ) {
         console.log('FireframeBase::create() data: ', this.data);
 
-        let data = this.data;
+        let data = _.cloneDeep(this.data);
+        this.clear();
         if ( data.key === void 0 ) { // push the data ( push a key and then set )
             console.log('No key. Goint to push()');
             this.list
                 .push( data )
-                .then( () => { this.clear(); successCallback(); } )
-                .catch( e => { this.clear(); failureCallback(e.message); } );
+                .then( () => { successCallback(); } )
+                .catch( e => { failureCallback(e.message); } );
         }
         else { // set the data
             let key = data.key;
@@ -65,10 +66,9 @@ export class FireframeBase {
             this.list
             this.getChildObject( key )
                 .set( data )
-                .then( () => { this.clear(); successCallback(); } )
+                .then( () => { successCallback(); } )
                 .catch( e => {
                     console.log("set() ERROR: " + e);
-                    this.clear();
                     failureCallback(e.message);
                 } );
         }
@@ -126,7 +126,7 @@ export class FireframeBase {
 
         if ( _.isEmpty( this.data )) return failureCallback('data is empty');
 
-        let data = (JSON.parse(JSON.stringify( this.data )));
+        let data = _.cloneDeep(this.data);
         this.clear();
 
         let key = data.key;
@@ -138,7 +138,6 @@ export class FireframeBase {
             delete data.key;
             this.getChild( key )
                 .update( data, re => {
-                    this.clear();
                     if ( re == null ) successCallback();
                     else failureCallback( re.message );
                 } )
