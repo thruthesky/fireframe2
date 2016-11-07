@@ -183,34 +183,26 @@ export class User extends FireframeBase {
         }, failureCallback);
     }
     // delete
-        resign(successCallback,failureCallback){
+resign(successCallback,failureCallback){
 
-            this.auth.subscribe(user => {  
-            
-                    let deleteUser = new Promise((resolve,reject)=>{
-                     
-                        this.delete( user.uid , s =>{
-                            resolve('User database data deleted');                   
-                        }, e => {
-                            reject('User not deleted : '+ e);
-                        });     
-                    });  
+    this.auth.subscribe(user => {  
 
-                    deleteUser
-                    .then(res=>{
-                        console.log('User data in database is deleted')
-                        return  user.auth.delete();                      
-                    })
-                    .then( res => {       
-                            successCallback(res);
-                    })
-                    .catch( err => {
-                            failureCallback(err);
-                    });  
-            });
-        
+         this.delete( user.uid , s =>{
+             user.auth
+                .delete()
+                  .then( () => {       
+                       successCallback('user is deleted');
+                  }).catch( err => {
+                      console.log('User Auth not deleted');
+                 });  
+                   
+         }, e => {
+            console.error('User data in database not deleted : '+ e)
+        });     
              
-        }
+    });
+
+}
     
 
 }
