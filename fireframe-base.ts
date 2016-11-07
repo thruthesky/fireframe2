@@ -9,6 +9,7 @@ import {
     AngularFire, FirebaseObjectObservable, FirebaseListObservable,
     } from 'angularfire2';
 import { Fireframe } from './fireframe';
+import * as _ from 'lodash';
 export class FireframeBase {
     private f: Fireframe;
     private af: AngularFire;
@@ -45,24 +46,30 @@ export class FireframeBase {
     /**
      * 
      */
-    create( successCallback, failureCallback ) {
+    create( successCallback: () => void, failureCallback: (e: string) => void ) {
+        console.log('FireframeBase::create() data: ', this.data);
 
-        let data = this.data;
+        let data = _.cloneDeep(this.data);
+        this.clear();
         if ( data.key === void 0 ) { // push the data ( push a key and then set )
+            console.log('No key. Going to push()');
             this.list
                 .push( data )
-                .then( () => { this.clear(); successCallback(); } )
-                .catch( e => { this.clear(); failureCallback(e); } );
+                .then( () => { successCallback(); } )
+                .catch( e => { failureCallback(e.message); } );
         }
         else { // set the data
             let key = data.key;
             delete data.key;
+            console.log('Key exists. Going to set() with key : ' + key);
+            console.log('FireframeBase::create() data: ', data);
+            this.list
             this.getChildObject( key )
                 .set( data )
-                .then( () => { this.clear(); successCallback(); } )
+                .then( () => { successCallback(); } )
                 .catch( e => {
-                    this.clear();
-                    failureCallback(e);
+                    console.log("set() ERROR: " + e);
+                    failureCallback(e.message);
                 } );
         }
     }
@@ -87,10 +94,12 @@ export class FireframeBase {
      * @Warning it will pass 'null' if the key does not exsits. This is the nature of firebase.
      */
     get( key, successCallback, failureCallback ) {
-        let ref = this.object.$ref.child(key);
-        ref.once('value', snapshot => {
-            successCallback( snapshot.val() );
-        }, failureCallback );
+        //let ref = this.object.$ref.child(key);
+        //ref
+        this.getChild( key )
+            .once('value', snapshot => {
+                successCallback( snapshot.val() );
+            }, failureCallback );
     }
 
     /**
@@ -113,9 +122,12 @@ export class FireframeBase {
     /**
      * update must(should) only update. no create.
      */
-    update( successCallback, failureCallback ) {
+    update( successCallback: () => void, failureCallback: (e: string) => void ) {
 
-        let data = (JSON.parse(JSON.stringify( this.data )));
+        console.log("FireframeBase::update() : this.data : ", this.data);
+        if ( _.isEmpty( this.data )) return failureCallback('data is empty');
+
+        let data = _.cloneDeep(this.data);
         this.clear();
 
         let key = data.key;
@@ -125,12 +137,11 @@ export class FireframeBase {
         this.get( key, re => {   // yes, key exists on server, so you can update.
             if ( re == null ) return failureCallback('key does not exists');
             delete data.key;
-            let ref = this.object.$ref;
-            ref.child( key )
+            console.log("Going to update: data : ", data);
+            this.getChild( key )
                 .update( data, re => {
-                    this.clear();
                     if ( re == null ) successCallback();
-                    else failureCallback( re );
+                    else failureCallback( re.message );
                 } )
                 .catch( e => failureCallback( e.message ) );
         }, e => failureCallback('sync failed: ' + e) );
@@ -140,16 +151,39 @@ export class FireframeBase {
 
     // delete
     delete( key, successCallback, failureCallback ) {
+        if ( ! this.isValidKey(key) ) return failureCallback('invalid key');
         this.get( key, re => {
             if ( re == null ) return failureCallback( 'key does not exist' );
-            let ref = this.object.$ref;
-            ref.child(key).remove()
+            //let ref = this.object.$ref;
+            //ref.child(key).remove()
+            this.getChild(key).remove()
                 .then( successCallback )
                 .catch( e => failureCallback( e ) );
         }, e => failureCallback( e ) );
     }
 
 
+    /**
+     * 
+     */
+    getChild( key: string ) : firebase.database.Reference {
+        if ( this.isValidKey( key ) ) {
+            let ref = this.object.$ref;
+            return ref.child( key )
+        }
+        else {
+            console.error("FireframeBase::getChild() invalid key: " + key);
+            return null;
+        }
+    }
     
+    /**
+     * return true if the key is valied
+     */
+    isValidKey(key) {
+        if ( key === undefined ) return false;
+        var invalidKeys = { '': '', '$': '$', '.': '.', '#': '#', '[': '[', ']': ']' };
+        return invalidKeys[key] === undefined;
+    }
 
 }

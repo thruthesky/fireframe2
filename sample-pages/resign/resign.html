@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar>
+    <ion-row>
+      <ion-col width-10><ion-icon name="home" (click)="onClickHome()"></ion-icon></ion-col>
+      <ion-col><ion-title>Resign</ion-title></ion-col>
+    </ion-row>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <section *ngIf=" login ">
+    <div warning>
+      You are logged in as "{{ loginData.email }}".
+    </div>
+      <button ion-button (click)="onClickResign()">RESIGN</button>
+  </section>
+
+</ion-content>

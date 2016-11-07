@@ -1,0 +1,63 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-row>
+      <ion-col width-10><ion-icon name="home" (click)="onClickHome()"></ion-icon></ion-col>
+      <ion-col><ion-title>Member Registration</ion-title></ion-col>
+    </ion-row>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  {{ loginData | json }}
+
+  <section *ngIf=" login ">
+    <div warning>
+      Welcome, {{ loginData.email }}
+    </div>
+  </section>
+    <ion-list>
+      <ion-item *ngIf=" ! login ">
+        <ion-label floating>Input Email</ion-label>
+        <ion-input [(ngModel)]="data.email"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf=" ! login ">
+        <ion-label floating>Input Password</ion-label>
+        <ion-input [(ngModel)]="data.password"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Name</ion-label>
+        <ion-input [(ngModel)]="data.name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Mobile</ion-label>
+        <ion-input [(ngModel)]="data.mobile"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Input Address</ion-label>
+        <ion-input [(ngModel)]="data.address"></ion-input>
+      </ion-item>
+
+      <div progress *ngIf=" progress ">
+        <ion-spinner name="bubbles"></ion-spinner>
+        {{ progress }}
+      </div>
+      <div warning *ngIf=" error ">
+        {{ error }}
+      </div>
+      <div result *ngIf=" result ">
+        {{ result }}
+      </div>
+
+      <button *ngIf=" ! login " ion-button (click)="onClickRegister()">REGISTER</button>
+      <button *ngIf=" login " ion-button (click)="onClickUpdate()">UPDATE</button>
+      <button ion-button (click)="onClickCancel()">CANCEL</button>
+    </ion-list>
+
+</ion-content>
