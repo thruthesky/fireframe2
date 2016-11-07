@@ -24,18 +24,36 @@ export class RegisterPage {
         public user: User
     ) {
         this.checkLogin();
+        /*
         let id = 'user24';
         this.data.email = id + '@naver.com';
         this.data.password = id;
         this.data.name = "Name: " + id;
         this.data.mobile = "Mobile: " + id;
         this.data.address = "Adderss: " + id;
+        */
     }
     checkLogin() {
-        this.user.loggedIn( u => this.loginData = u, () => this.loginData = null );
+        this.user.loggedIn( u => {
+            this.loginData = u;
+            this.loadUser();
+        }, () => this.loginData = null );
     }
     get login() {
         return !! this.loginData;
+    }
+    loadUser() {
+        console.log("RegisterPage::loadUser()", this.loginData);
+        this.user
+            .set('key', this.loginData.uid)
+            .get( (user) => {
+            console.log('user: ', user);
+            this.data.name = "Name: " + user.name;
+            this.data.mobile = "Mobile: " + user.mobile;
+            this.data.address = "Adderss: " + user.address;
+        }, e => {
+            alert( e );
+        });
     }
     setError( message ) {
         this.result = null;
@@ -52,7 +70,6 @@ export class RegisterPage {
         this.error = null;
         this.progress = null;
     }
-
     onClickRegister() {
         this.setProgress('Registraion is on going...')
         this.user.sets(this.data).register( () => {
@@ -61,9 +78,16 @@ export class RegisterPage {
         }, e => this.setError( e ) );
     }
     onClickUpdate() {
-
+        console.log('RegisterPage::onClickUpdate() : ', this.data);
+        this.setProgress('Updating ...');
+        this.user
+            .sets( this.data )
+            .set( 'key', this.loginData.uid )
+            .update( () => {
+                this.setResult('User update success.');
+                this.checkLogin();
+            }, e => this.setError(e) );
     }
-
     onClickCancel() {
         this.navCtrl.setRoot( SampleHomePage );
     }
