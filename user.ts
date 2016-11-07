@@ -187,7 +187,8 @@ export class User extends FireframeBase {
 
             this.auth.subscribe(user => {  
             
-                    let deleteUser = new Promise(function(resolve,reject){
+                    let deleteUser = new Promise((resolve,reject)=>{
+                     
                         this.delete( user.uid , s =>{
                             resolve('User database data deleted');                   
                         }, e => {
