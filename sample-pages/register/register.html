@@ -3,7 +3,10 @@
   <ion-navbar>
     <ion-row>
       <ion-col width-10><ion-icon name="home" (click)="onClickHome()"></ion-icon></ion-col>
-      <ion-col><ion-title>Member Registration</ion-title></ion-col>
+      <ion-col>
+        <ion-title *ngIf=" !login ">Member Registration</ion-title>
+        <ion-title *ngIf=" login" >Member Update</ion-title>
+      </ion-col>
     </ion-row>
   </ion-navbar>
 
@@ -11,7 +14,6 @@
 
 
 <ion-content padding>
-  {{ loginData | json }}
 
   <section *ngIf=" login ">
     <div warning>
