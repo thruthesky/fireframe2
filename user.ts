@@ -148,7 +148,7 @@ export class User extends FireframeBase {
             let key = user.uid;
             this.set('key', key).set('uid', key); // @Warning this.data is already set hereby. It is olnly adding key.
             console.log('User::update() currentUser : ', user, key );
-            this.get( key, re => { // get data to check if it exists.
+            this.set('key', key).get( re => { // get data to check if it exists.
                 console.log('User::update() get() re: ', re);
                 if ( re == null ) { // key does not exist.
                     console.log('User info does not exist in DB. Going to create a new info.');

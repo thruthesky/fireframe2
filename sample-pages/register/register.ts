@@ -44,7 +44,9 @@ export class RegisterPage {
     }
     loadUser() {
         console.log("RegisterPage::loadUser()", this.loginData);
-        this.user.get( this.loginData.uid, (user) => {
+        this.user
+            .set('key', this.loginData.uid)
+            .get( (user) => {
             console.log('user: ', user);
             this.data.name = "Name: " + user.name;
             this.data.mobile = "Mobile: " + user.mobile;

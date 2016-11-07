@@ -73,6 +73,65 @@ Or you can do something like Below
 ````
 
 
+### User Registration
+
+* way to do Registration
+
+````
+
+    this.user
+     .sets(this.userData)
+     .register(
+        ( ) => this.alert('User registration success'),
+        (e) => this.alert(e) );
+
+````
+
+
+
+### How to show loader
+
+
+
+class ABC {
+  track;
+  update() {
+    if ( this.question.answer == '' ) {
+      this.track = { error: 'Input answer' };
+      return;
+    }
+    this.track = { progress: 'Updating ...' };
+    this.questionPost
+      .set( 'key', this.questionID )
+      .set( 'question', this.question.question )
+      .set( 'answer', this.question.answer )
+      .update( () => {
+        this.track = { success: 'Update success!' };
+      },e=>{
+        this.track = { error: 'Update error...'};
+      })
+  }
+}
+
+
+* How to put CSS
+
+````
+
+    [progress] {
+        background-color: blue;
+        color:white;
+    }
+    [error] {
+        background-color: red;
+        color: white;
+    }
+    [success] {
+        background-color: green;
+        color: white;
+    }
+
+````
 
 
 

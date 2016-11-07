@@ -38,6 +38,9 @@ export class FireframeBase {
         this.data = data;
         return this;
     }
+    /**
+     * @todo remove this method. It produces more errors.
+     */
     clear() {
         this.data = {};
         return this;
@@ -93,9 +96,10 @@ export class FireframeBase {
      * 
      * @Warning it will pass 'null' if the key does not exsits. This is the nature of firebase.
      */
-    get( key, successCallback, failureCallback ) {
+    get( successCallback, failureCallback ) {
         //let ref = this.object.$ref.child(key);
         //ref
+        let key = this.data.key;
         this.getChild( key )
             .once('value', snapshot => {
                 successCallback( snapshot.val() );
@@ -128,17 +132,13 @@ export class FireframeBase {
         if ( _.isEmpty( this.data )) return failureCallback('data is empty');
 
         let data = _.cloneDeep(this.data);
-        this.clear();
-
-        let key = data.key;
 
         // @todo data validation. check if key exists in this.data and in server. check if data exists.
 
-        this.get( key, re => {   // yes, key exists on server, so you can update.
+        this.get( re => {   // yes, key exists on server, so you can update.
             if ( re == null ) return failureCallback('key does not exists');
-            delete data.key;
             console.log("Going to update: data : ", data);
-            this.getChild( key )
+            this.getChild( this.data.key )
                 .update( data, re => {
                     if ( re == null ) successCallback();
                     else failureCallback( re.message );
@@ -152,7 +152,7 @@ export class FireframeBase {
     // delete
     delete( key, successCallback, failureCallback ) {
         if ( ! this.isValidKey(key) ) return failureCallback('invalid key');
-        this.get( key, re => {
+        this.get( re => {
             if ( re == null ) return failureCallback( 'key does not exist' );
             //let ref = this.object.$ref;
             //ref.child(key).remove()
