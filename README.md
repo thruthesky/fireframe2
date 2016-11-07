@@ -32,6 +32,10 @@ How to test...
   );
 //  this.userTest.test( () => {} );
 
+# Coding Guideline
+
+It uses @ionic/storage to support offline login.
+
 
 # USER
 
