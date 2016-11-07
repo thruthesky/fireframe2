@@ -133,7 +133,7 @@ export class CategoryTest {
    }
 
     getNonExistKey( callback){
-        this.category.get("notexist", s=>{
+        this.category.set('key', 'noexist').get(s=>{
             if(s) test.fail('get: non existing key ');
             else  test.pass(' get: fail to get non existing key. result is: ' + s );
             callback();
@@ -144,7 +144,7 @@ export class CategoryTest {
     }
 
     get(key, callback){
-        this.category.get(key, s=>{
+        this.category.set('key', key).get(s=>{
            if(s)  test.pass('get: ' + key + ": " + JSON.stringify(s));
            else  test.fail('failed to get:' + key );
             callback();
