@@ -193,11 +193,11 @@ resign(successCallback,failureCallback){
                   .then( () => {       
                        successCallback('user is deleted');
                   }).catch( err => {
-                      console.log('User Auth not deleted');
+                      failureCallback('User Auth not deleted');
                  });  
                    
          }, e => {
-            console.error('User data in database not deleted : '+ e)
+           failureCallback('User data in database not deleted : '+ e)
         });     
              
     });
