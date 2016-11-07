@@ -6,7 +6,9 @@ export class CategoryTest {
     constructor( private category: Category ) {
         console.log('CategoryTest::constructor() category: ', category);
     }
-    test( callback ) {
+
+
+ test( callback ) {
         console.log('test()');
         console.log( this.category, this.category.path );
 
@@ -14,36 +16,89 @@ export class CategoryTest {
         if ( this.category.path == 'category' ) test.pass('success');
         else test.fail('path of cateogry is not category');
 
-        this.destroy( () => 
+
+        this.createTest( ()=>
+            this.updateTest( ()=>
+                this.deleteTest( ()=> 
+                    this.getTest( ()=>
+                        this.setTest( callback)
+                    )
+                )
+            )
+        );     
+  }
+
+
+
+
+    deleteTest(callback){
+                this.destroy( () =>
+                    this.create( 'apple', 'red', () =>
+                        this.count( 1, ()=> 
+                            this.delete( 'apple', () => 
+                                this.count( 0, ()=> 
+                                    this.create( 'apple', 'red', () =>
+                                        this.create( 'banana', 'green', () =>
+                                            this.delete( 'banana', () => 
+                                               this.count( 1, callback)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+      
+    }
+
+   
+    createTest(callback){
+         this.destroy( () => 
             this.create( 'apple', 'red', () =>
                 this.create( 'banana', 'yellow', () =>
                     this.create( 'cherry', 'darkred', () =>
-                        this.count( 3, () =>
-                            this.delete( 'banana', () => 
-                                this.count( 2, () =>
-                                    this.update('apple', () =>
-                                        this.get('apple', () =>
-                                           this.getNonExistKey( () =>
-                                              this.gets( () =>
-                                                  this.count( 2, () =>
-                                                    this.set("key", "cherry", () =>
-                                                      this.sets( ()=>
-                                                        this.clear(callback)
-                                                      )
-                                                    )
-                                                  )          
-                                              )
-                                           )
-                                        )
-                                     )
-                                  )
-                               )
+                        this.count( 3, ()=>
+                            this.create( 'guava', 'yellow', () =>
+                               this.create( 'grapes', 'violet', () =>
+                                   this.count( 5, callback)  
+                               )                        
                             )
                         )
                     )
                 )
-                                                      );            
-         }
+            )
+         );
+    }
+
+    updateTest(callback){
+         this.destroy( () => 
+            this.create( 'apple', 'red', () =>
+                this.create( 'banana', 'yellow', () =>
+                     this.update('apple', callback)
+                )
+            )
+         );
+    }
+
+    getTest(callback){
+          this.get('apple', () =>
+            this.getNonExistKey( () =>
+                this.gets( callback)
+            )
+          );
+    }
+
+    setTest(callback){
+         this.set("key", "cherry", () =>
+              this.sets( ()=>
+                    this.clear(callback)
+              )
+         );                                                                                                  
+    }
+
+
+   
 
 
     destroy( callback ) {
