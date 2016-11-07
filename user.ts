@@ -183,10 +183,15 @@ export class User extends FireframeBase {
         }, failureCallback);
     }
     // delete
-
-    delete( successCallback , failureCallback){
-            
-
-    }
+resign(successCallback,failureCallback){
+    this.auth.subscribe(user=>{   
+        user.auth.delete().then(()=>{       
+            this.delete(user.uid,s=>{
+                successCallback('user is deleted');
+            },e=>{});     
+        }).catch(e=> failureCallback(e));    
+    });
+}
+    
 
 }

@@ -32,23 +32,23 @@ export class CategoryTest {
 
 
     deleteTest(callback){
-      this.destroy( () =>
-         this.create( 'apple', 'red', () =>
-             this.count( 1, ()=> 
-                 this.delete( 'apple', () => 
-                    this.count( 0, ()=> 
-                        this.create( 'apple', 'red', () =>
-                            this.create( 'banana', 'green', () =>
-                                this.delete( 'banana', () => 
-                                   this.count( 1, callback)
+                this.destroy( () =>
+                    this.create( 'apple', 'red', () =>
+                        this.count( 1, ()=> 
+                            this.delete( 'apple', () => 
+                                this.count( 0, ()=> 
+                                    this.create( 'apple', 'red', () =>
+                                        this.create( 'banana', 'green', () =>
+                                            this.delete( 'banana', () => 
+                                               this.count( 1, callback)
+                                            )
+                                        )
+                                    )
                                 )
                             )
                         )
                     )
-                 )
-             )
-         )
-      );
+                );
       
     }
 
