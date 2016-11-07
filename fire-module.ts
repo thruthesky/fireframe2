@@ -15,12 +15,14 @@ import { UserTest } from './test/user-test';
  * @warning Do not change this unless you have right reason.
  */
 let firebaseConfig = {
-     apiKey: "AIzaSyDgVNWHWVRogTbKvTftNoNv7cSmtFaAfz0",
-    authDomain: "fir-app-f2d67.firebaseapp.com",
-    databaseURL: "https://fir-app-f2d67.firebaseio.com",
-    storageBucket: "fir-app-f2d67.appspot.com",
-    messagingSenderId: "552188619868"
+  apiKey: "AIzaSyAMi-uW1xDYaKQj8U2M_DVJ-9ORHzdj-yo",
+    authDomain: "test-ad670.firebaseapp.com",
+    databaseURL: "https://test-ad670.firebaseio.com",
+    storageBucket: "test-ad670.appspot.com",
+    messagingSenderId: "441630744163"
+
 };
+
 
 
 @NgModule({
