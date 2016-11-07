@@ -12,25 +12,25 @@ export class UserTest {
 
         let id = 'user-no-4';
         this.login( id, id, x => {
-            this.update( id, x => {
-                this.logout( x => {
-                    this.logoutUpdate( id, x => {
+          //  this.update( id, x => {
+            //    this.logout( x => {
+                 //   this.logoutUpdate( id, x => {
                         callback()
-                    });
-                })
-            })
+                 //   });
+              //  })
+          //  })
         });
 
-/*
-        let id = 'user-no-5';
-        this.create(id, x =>
-            this.login( id, id, x => {
-                this.update( id, x => 
-                    callback()
-                )
-            } )
-        );
-        */
+
+       
+        // this.create(id, x =>
+        //     this.login( id, id, x => {
+        //         this.update( id, x => 
+        //             callback()
+        //         )
+        //     } )
+        // );
+        
 
 
     }

@@ -14,12 +14,17 @@ export class PostTest {
         this.remove( () =>
             this.create('1st post', () =>
                 this.create( '2nd post', () =>
-                    this.create( '3rd post', () => {
-                        callback();
-                    })
+                    this.create( '3rd post', () => 
+                       this.gets(()=>  
+                         callback()
+                       )
+                    )
                 )
             )
         );
+
+
+        
     }
     remove( callback ) {
         this.post.destroy( () => {
@@ -44,6 +49,25 @@ export class PostTest {
                 callback();
             });
     }
+
+    /*
+     * 
+     * To iterate over gets() results this method or process
+     * 
+     * for (let key in  snapshot) {           
+     *    console.log(snapshot[key]);          
+     * }
+     * 
+     */
+
+    
+   gets(callback){ 
+       this.post.gets(snapshot=>{       
+            if(snapshot) test.pass('Post gets() success');                        
+       }, e=>{
+           test.fail('Post gets() fail to retrieve data, error: ' + e);
+       })
+   }
 
 
 }
