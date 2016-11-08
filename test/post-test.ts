@@ -22,7 +22,9 @@ export class PostTest {
                     this.create( '3rd post', () => 
                        this.gets(()=>  
                          this.deleteTest( () =>
-                            callback()
+                            this.get( () =>
+                               callback()
+                            )
                          )
                        )
                     )
@@ -42,14 +44,14 @@ export class PostTest {
 
    
 
-    deleteWithPromise( callback ){                 
+    loopThruKeysAndDelete( callback ){                 
             if( PostTest.count < this.toDeleteKeys.length){          
                 this.post
                 .set('key', this.toDeleteKeys[ PostTest.count])
                 .delete( () => {
                     test.pass("Post delete success with key:" + this.toDeleteKeys[ PostTest.count]);
                     PostTest.count++;
-                    this.deleteWithPromise( callback );
+                    this.loopThruKeysAndDelete( callback );
                 }, e => {
                     test.fail('Post delete failed with key:' + this.toDeleteKeys[ PostTest.count] + ", error: " + e);
                     callback();
@@ -66,7 +68,7 @@ export class PostTest {
             for (let key in  snapshot) {  
                 this.toDeleteKeys.push(key);                
             }   
-            this.deleteWithPromise( callback );           
+            this.loopThruKeysAndDelete( callback );           
             }                                  
        }, e=> {
            test.fail('Post gets() fail to retrieve data, error: ' + e);
@@ -110,7 +112,27 @@ export class PostTest {
      * 
      */
 
-    
+    get( callback ){  
+        this.create( 'Fruits', () => 
+            this.create( 'Breads', () => {
+              this.post.gets( snapValue =>{
+                   if(snapValue){ test.pass('Post gets() success');   
+                    for (let key in  snapValue) {           
+                            this.post.set("key",key);
+                            this.post.get( s=> {
+                                if(s) test.pass('Post get() success on key:' + key);
+                            },e =>{
+                                   test.fail('Post get() success on key:' + key + ', Error:' + e);
+                            });      
+                        }
+                   }
+              }, e =>{
+                  test.fail('Post gets() success with error:' + e);
+              })
+              
+            })
+         );
+    }
    gets(callback){ 
        this.post.gets(snapshot=>{       
             if(snapshot) test.pass('Post gets() success');    
