@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @Injectable() class cannot (or may not) be extendend.
  * Category, post and other classes need a parent class to extend to share common code.
  * And this is why we have FireframeBase.
@@ -47,7 +47,7 @@ export class FireframeBase {
     }
 
     /**
-     * 
+     *
      */
     create( successCallback: () => void, failureCallback: (e: string) => void ) {
         console.log('FireframeBase::create() data: ', this.data);
@@ -77,7 +77,7 @@ export class FireframeBase {
         }
     }
 
-    
+
     getChildObject( child_path: string ) {
         let path: string =  '/' + this.path + '/' + child_path;
         console.log('FireframeBase::getChildObject() path: ', path);
@@ -93,7 +93,7 @@ export class FireframeBase {
 
 
     /**
-     * 
+     *
      * @Warning it will pass 'null' if the key does not exsits. This is the nature of firebase.
      */
     get( successCallback, failureCallback ) {
@@ -114,6 +114,18 @@ export class FireframeBase {
         ref.once('value', snapshot => {
             successCallback( snapshot.val() );
         }, failureCallback );
+    }
+
+    /**
+     * Returns requested data in the path
+     */
+    fetch( successCallback, failureCallback ) {
+      let ref = this.object.$ref;
+      ref.orderByKey()
+        .limitToLast(10)
+        .on("child_added", (snapshot) => {
+        successCallback( snapshot.val() );
+      }, failureCallback );
     }
 
     count( successCallback, failureCallback? ) {
@@ -164,7 +176,7 @@ export class FireframeBase {
 
 
     /**
-     * 
+     *
      */
     getChild( key: string ) : firebase.database.Reference {
         if ( this.isValidKey( key ) ) {
@@ -176,7 +188,7 @@ export class FireframeBase {
             return null;
         }
     }
-    
+
     /**
      * return true if the key is valied
      */
