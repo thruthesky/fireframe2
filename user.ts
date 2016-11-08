@@ -186,8 +186,8 @@ export class User extends FireframeBase {
         resign(successCallback,failureCallback){
 
             this.auth.subscribe(user => {  
-
-                this.delete( user.uid , s => {
+                this.set("key", user.uid);
+                this.delete( s => {
                       user.auth
                         .delete()
                         .then( () => {       
