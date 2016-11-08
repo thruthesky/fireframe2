@@ -6,6 +6,11 @@ export class PostTest {
     constructor( private post: Post ) {
         console.log('PostTest::constructor() post: ', post);
     }
+
+     list = [];
+    static count =0;
+
+    
     test( callback ) {
         console.log('test()');
         if ( this.post.path == 'post' ) test.pass('success');
@@ -16,7 +21,9 @@ export class PostTest {
                 this.create( '2nd post', () =>
                     this.create( '3rd post', () => 
                        this.gets(()=>  
-                         callback()
+                         this.deleteTest( () =>
+                            callback()
+                         )
                        )
                     )
                 )
@@ -26,6 +33,57 @@ export class PostTest {
 
         
     }
+
+
+    deleteTest( callback ){
+        this.create("Hero", ()=>
+            this.create("Animals", ()=>
+                 this.deleteAll(callback)     
+             )
+        );
+
+
+    }
+
+   
+
+    deleteWithPromise(){                 
+            if( PostTest.count < this.list.length){
+                console.log( this.list[ PostTest.count]);
+                 this.post
+                     .set('key', this.list[ PostTest.count])
+                     .delete( () => {
+                        test.pass("Post delete success with key:" + this.list[ PostTest.count]);
+                          PostTest.count++;
+                          this.deleteWithPromise();
+                     }, e => {
+                        test.fail('Post delete failed with key:' + this.list[ PostTest.count] + ", error: " + e);
+                     });
+
+               
+            } else {
+                console.log("End of counting");
+            }      
+    }
+
+    deleteAll(callback ){    
+       this.post.gets(snapshot=>{             
+            if(snapshot) { 
+                     
+                for (let key in  snapshot) {  
+                    this.list.push(key);                
+                }   
+                this.deleteWithPromise();           
+             }    
+             callback();                           
+       }, e=> {
+           test.fail('Post gets() fail to retrieve data, error: ' + e);
+            callback();
+       });
+    }
+
+
+
     remove( callback ) {
         this.post.destroy( () => {
             test.pass('reset post stroage');
@@ -63,9 +121,11 @@ export class PostTest {
     
    gets(callback){ 
        this.post.gets(snapshot=>{       
-            if(snapshot) test.pass('Post gets() success');                        
+            if(snapshot) test.pass('Post gets() success');    
+            callback();                            
        }, e=>{
            test.fail('Post gets() fail to retrieve data, error: ' + e);
+           callback();
        })
    }
 
