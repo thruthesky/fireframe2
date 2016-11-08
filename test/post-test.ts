@@ -23,7 +23,9 @@ export class PostTest {
                        this.gets(()=>  
                          this.deleteTest( () =>
                             this.get( () =>
+                              this.update( () =>
                                callback()
+                              )
                             )
                          )
                        )
@@ -121,13 +123,16 @@ export class PostTest {
                             this.post.set("key",key);
                             this.post.get( s=> {
                                 if(s) test.pass('Post get() success on key:' + key);
+                                callback();
                             },e =>{
                                    test.fail('Post get() success on key:' + key + ', Error:' + e);
+                                callback();
                             });      
                         }
                    }
               }, e =>{
                   test.fail('Post gets() success with error:' + e);
+                  callback();
               })
               
             })
@@ -141,6 +146,35 @@ export class PostTest {
            test.fail('Post gets() fail to retrieve data, error: ' + e);
            callback();
        })
+   }
+
+   update( callback ){
+        this.create( 'Birds', () => 
+            this.create( 'Dogs', () => 
+              this.post.gets( snapValue => {
+                   if(snapValue){ test.pass('Post gets() success');   
+                        for (let key in  snapValue) {           
+                                this.post.set("key",key);
+                                this.post.set("title", "Pets")
+                                this.post.update(()=>{
+                                    this.post.get(val=>{
+                                        if(val.title == "Pets") test.pass('Post update success on key:' + key);
+                                        else test.fail('Post update fail on key:' + key);
+                                    }, e=>{
+                                         test.fail('Post update fail with get() on erro:' + key);
+                                    });
+                                },
+                                e=>{
+                                    test.fail('Post update() fail with error:' + e);  
+                                });
+                        }
+                   }
+              }, e => {
+                  test.fail('Post gets() success with error:' + e);
+              })
+              
+            )
+         );
    }
 
 

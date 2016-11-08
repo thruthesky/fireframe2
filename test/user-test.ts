@@ -10,24 +10,34 @@ export class UserTest {
         console.log('UserTest::test()');
 
 
-        let id = 'user-no-4';
-       this.login( id, id, x => {
+      let id = 'user-no-4';
+      this.create(id, x => {
+        this.login( id, id, x => {
            this.update( id, x => {
                this.logout( x => {
-                   this.logoutUpdate( id, x => {
-                       callback()
-                   });
+                   this.resign( () => {
+                        this.logoutUpdate( id, x => {
+                            callback()
+                        });
+                   })
                })
            })
-       });
+       })
+    });
 
 
        
         //  this.create(id, x =>
-        //  this.login( id, id, x => {
-        //          this.update( id, x => 
-        //              callback()
-        //          )
+        //     this.login( id, id, x => {
+        //         this.update( id, x => {
+                  
+        //                this.resign( () => {
+        //                   this.logoutUpdate( id, x => {
+        //                       callback()
+        //                   });
+        //                })
+                    
+        //           })
         //      } )
         //  );
         
@@ -61,6 +71,9 @@ export class UserTest {
     logout( callback ) {
         this.user.logout( callback );
     }
+
+
+
     update( id, callback ) {
         this.user
             .set('name', 'Name: ' + id )
@@ -85,6 +98,17 @@ export class UserTest {
                 callback();
             });
     }
+
+    resign(callback){
+        this.user.resign( s =>{
+            test.pass('User resign success:' + s);
+            callback();
+        }, e=>{
+            test.fail('User resign failed with error: ' + e);
+            callback();
+        });
+    }
+
 }
 
 
