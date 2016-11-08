@@ -6,6 +6,11 @@ export class PostTest {
     constructor( private post: Post ) {
         console.log('PostTest::constructor() post: ', post);
     }
+
+     toDeleteKeys = [];
+    static count =0;
+
+
     test( callback ) {
         console.log('test()');
         if ( this.post.path == 'post' ) test.pass('success');
@@ -16,16 +21,65 @@ export class PostTest {
                 this.create( '2nd post', () =>
                     this.create( '3rd post', () => 
                        this.gets(()=>  
-                         callback()
+                         this.deleteTest( () =>
+                            this.get( () =>
+                              this.update( () =>
+                               callback()
+                              )
+                            )
+                         )
                        )
                     )
                 )
             )
-        );
-
-
-        
+        );   
     }
+
+
+    deleteTest( callback ){
+        this.create("Hero", ()=>
+            this.create("Animals", ()=>
+                 this.deleteAll(callback)     
+             )
+        );
+    }
+
+   
+
+    loopThruKeysAndDelete( callback ){                 
+            if( PostTest.count < this.toDeleteKeys.length){          
+                this.post
+                .set('key', this.toDeleteKeys[ PostTest.count])
+                .delete( () => {
+                    test.pass("Post delete success with key:" + this.toDeleteKeys[ PostTest.count]);
+                    PostTest.count++;
+                    this.loopThruKeysAndDelete( callback );
+                }, e => {
+                    test.fail('Post delete failed with key:' + this.toDeleteKeys[ PostTest.count] + ", error: " + e);
+                    callback();
+                });       
+            } else {
+                console.log("End of counting");
+                callback();
+            }      
+    }
+
+    deleteAll( callback ){    
+       this.post.gets(snapshot=>{             
+            if(snapshot) {                 
+            for (let key in  snapshot) {  
+                this.toDeleteKeys.push(key);                
+            }   
+            this.loopThruKeysAndDelete( callback );           
+            }                                  
+       }, e=> {
+           test.fail('Post gets() fail to retrieve data, error: ' + e);
+            callback();
+       });
+    }
+
+
+
     remove( callback ) {
         this.post.destroy( () => {
             test.pass('reset post stroage');
@@ -60,13 +114,67 @@ export class PostTest {
      * 
      */
 
-    
+    get( callback ){  
+        this.create( 'Fruits', () => 
+            this.create( 'Breads', () => {
+              this.post.gets( snapValue =>{
+                   if(snapValue){ test.pass('Post gets() success');   
+                    for (let key in  snapValue) {           
+                            this.post.set("key",key);
+                            this.post.get( s=> {
+                                if(s) test.pass('Post get() success on key:' + key);
+                                callback();
+                            },e =>{
+                                   test.fail('Post get() success on key:' + key + ', Error:' + e);
+                                callback();
+                            });      
+                        }
+                   }
+              }, e =>{
+                  test.fail('Post gets() success with error:' + e);
+                  callback();
+              })
+              
+            })
+         );
+    }
    gets(callback){ 
        this.post.gets(snapshot=>{       
-            if(snapshot) test.pass('Post gets() success');                        
+            if(snapshot) test.pass('Post gets() success');    
+            callback();                            
        }, e=>{
            test.fail('Post gets() fail to retrieve data, error: ' + e);
+           callback();
        })
+   }
+
+   update( callback ){
+        this.create( 'Birds', () => 
+            this.create( 'Dogs', () => 
+              this.post.gets( snapValue => {
+                   if(snapValue){ test.pass('Post gets() success');   
+                        for (let key in  snapValue) {           
+                                this.post.set("key",key);
+                                this.post.set("title", "Pets")
+                                this.post.update(()=>{
+                                    this.post.get(val=>{
+                                        if(val.title == "Pets") test.pass('Post update success on key:' + key);
+                                        else test.fail('Post update fail on key:' + key);
+                                    }, e=>{
+                                         test.fail('Post update fail with get() on erro:' + key);
+                                    });
+                                },
+                                e=>{
+                                    test.fail('Post update() fail with error:' + e);  
+                                });
+                        }
+                   }
+              }, e => {
+                  test.fail('Post gets() success with error:' + e);
+              })
+              
+            )
+         );
    }
 
 
