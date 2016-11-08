@@ -7,10 +7,10 @@ export class PostTest {
         console.log('PostTest::constructor() post: ', post);
     }
 
-     list = [];
+     toDeleteKeys = [];
     static count =0;
 
-    
+
     test( callback ) {
         console.log('test()');
         if ( this.post.path == 'post' ) test.pass('success');
@@ -28,10 +28,7 @@ export class PostTest {
                     )
                 )
             )
-        );
-
-
-        
+        );   
     }
 
 
@@ -41,41 +38,36 @@ export class PostTest {
                  this.deleteAll(callback)     
              )
         );
-
-
     }
 
    
 
-    deleteWithPromise(){                 
-            if( PostTest.count < this.list.length){
-                console.log( this.list[ PostTest.count]);
-                 this.post
-                     .set('key', this.list[ PostTest.count])
-                     .delete( () => {
-                        test.pass("Post delete success with key:" + this.list[ PostTest.count]);
-                          PostTest.count++;
-                          this.deleteWithPromise();
-                     }, e => {
-                        test.fail('Post delete failed with key:' + this.list[ PostTest.count] + ", error: " + e);
-                     });
-
-               
+    deleteWithPromise( callback ){                 
+            if( PostTest.count < this.toDeleteKeys.length){          
+                this.post
+                .set('key', this.toDeleteKeys[ PostTest.count])
+                .delete( () => {
+                    test.pass("Post delete success with key:" + this.toDeleteKeys[ PostTest.count]);
+                    PostTest.count++;
+                    this.deleteWithPromise( callback );
+                }, e => {
+                    test.fail('Post delete failed with key:' + this.toDeleteKeys[ PostTest.count] + ", error: " + e);
+                    callback();
+                });       
             } else {
                 console.log("End of counting");
+                callback();
             }      
     }
 
-    deleteAll(callback ){    
+    deleteAll( callback ){    
        this.post.gets(snapshot=>{             
-            if(snapshot) { 
-                     
-                for (let key in  snapshot) {  
-                    this.list.push(key);                
-                }   
-                this.deleteWithPromise();           
-             }    
-             callback();                           
+            if(snapshot) {                 
+            for (let key in  snapshot) {  
+                this.toDeleteKeys.push(key);                
+            }   
+            this.deleteWithPromise( callback );           
+            }                                  
        }, e=> {
            test.fail('Post gets() fail to retrieve data, error: ' + e);
             callback();
