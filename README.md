@@ -149,5 +149,40 @@ class ABC {
 
 ````
 
+### File upload
+
+
+* on Template
+
+````
+
+      <ion-item>
+        <div>
+          <img *ngIf=" urlPhoto " [src]="urlPhoto">
+        </div>
+        <input type="file" (change)="onFileChange($event)">
+        <div>
+          <progress [value]="position" max="100"></progress>
+        </div>
+      </ion-item>
+
+````
+
+
+* on class
+
+````
+
+    onFileChange(event) {
+        this.data.upload( event.target.files[0], url => {
+            this.urlPhoto = url;
+        },
+        e => alert(e),
+        percent => {
+            this.position = percent;
+        } );
+    }
+
+````
 
 

@@ -8,6 +8,7 @@ import { Post } from './post';
 import { PostTest } from './test/post-test';
 import { User } from './user';
 import { UserTest } from './test/user-test';
+import { Data } from './data';
 
 /**
  * Withcenter Dev Team Open Account.
@@ -31,7 +32,7 @@ let firebaseConfig = {
   ],
   providers: [
     Storage,
-    Fireframe, Category, User, Post,
+    Fireframe, Category, User, Post, Data,
     CategoryTest, PostTest, UserTest
    ]
 })

@@ -20,30 +20,42 @@
       Welcome, {{ loginData.email }}
     </div>
   </section>
+
     <ion-list>
+
+      <ion-item>
+        <div>
+          <img *ngIf=" urlPhoto " [src]="urlPhoto">
+        </div>
+        <input type="file" (change)="onFileChange($event)">
+        <div>
+          <progress [value]="position" max="100"></progress>
+        </div>
+      </ion-item>
+
       <ion-item *ngIf=" ! login ">
         <ion-label floating>Input Email</ion-label>
-        <ion-input [(ngModel)]="data.email"></ion-input>
+        <ion-input [(ngModel)]="userData.email"></ion-input>
       </ion-item>
 
       <ion-item *ngIf=" ! login ">
         <ion-label floating>Input Password</ion-label>
-        <ion-input [(ngModel)]="data.password"></ion-input>
+        <ion-input [(ngModel)]="userData.password"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label floating>Input Name</ion-label>
-        <ion-input [(ngModel)]="data.name"></ion-input>
+        <ion-input [(ngModel)]="userData.name"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label floating>Input Mobile</ion-label>
-        <ion-input [(ngModel)]="data.mobile"></ion-input>
+        <ion-input [(ngModel)]="userData.mobile"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label floating>Input Address</ion-label>
-        <ion-input [(ngModel)]="data.address"></ion-input>
+        <ion-input [(ngModel)]="userData.address"></ion-input>
       </ion-item>
 
       <div progress *ngIf=" progress ">
