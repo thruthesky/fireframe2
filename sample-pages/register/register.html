@@ -24,11 +24,14 @@
     <ion-list>
 
       <ion-item>
-        <div>
-          <img *ngIf=" urlPhoto " [src]="urlPhoto">
+        <div *ngIf=" urlPhoto ">
+          <img [src]="urlPhoto">
+          <div>
+            <button ion-button (click)="onClickDeletePhoto()">DELETE</button>
+          </div>
         </div>
-        <input type="file" (change)="onFileChange($event)">
-        <div>
+        <input type="file" (change)="onChangeFile($event)">
+        <div *ngIf=" file_progress ">
           <progress [value]="position" max="100"></progress>
         </div>
       </ion-item>

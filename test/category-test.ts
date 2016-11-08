@@ -156,7 +156,8 @@ export class CategoryTest {
     }
 
     delete( key, callback ) {
-        this.category.delete( key, () => {
+        this.category.set("key", key);
+        this.category.delete( () => {
             test.pass('deleted: ' + key );
             callback();
         }, e => {

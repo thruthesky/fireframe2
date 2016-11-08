@@ -96,10 +96,10 @@ export class FireframeBase {
      *
      * @Warning it will pass 'null' if the key does not exsits. This is the nature of firebase.
      */
-    get( successCallback, failureCallback ) {
+    get(successCallback, failureCallback ) {
         //let ref = this.object.$ref.child(key);
         //ref
-        let key = this.data.key;
+       let key = this.data.key;
         this.getChild( key )
             .once('value', snapshot => {
                 successCallback( snapshot.val() );
@@ -162,13 +162,13 @@ export class FireframeBase {
     }
 
     // delete
-    delete( key, successCallback, failureCallback ) {
-        if ( ! this.isValidKey(key) ) return failureCallback('invalid key');
+    delete(successCallback, failureCallback ) {    
+        if ( ! this.isValidKey(this.data.key) ) return failureCallback('invalid key');
         this.get( re => {
             if ( re == null ) return failureCallback( 'key does not exist' );
             //let ref = this.object.$ref;
             //ref.child(key).remove()
-            this.getChild(key).remove()
+            this.getChild(this.data.key).remove()
                 .then( successCallback )
                 .catch( e => failureCallback( e ) );
         }, e => failureCallback( e ) );
