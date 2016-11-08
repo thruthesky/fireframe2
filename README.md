@@ -91,7 +91,19 @@ Or you can do something like Below
 
 ### How to show loader
 
+* on Template
 
+````
+
+  <div progress *ngIf=" track?.progress "><ion-spinner></ion-spinner>{{ track.progress }}</div>
+  <div success *ngIf=" track?.success "><ion-icon name="checkmark"></ion-icon>{{ track.success }}</div>
+  <div error *ngIf=" track?.error "><ion-icon name="bug"></ion-icon>{{ track.error }}</div>
+
+````
+
+* on class
+
+````
 
 class ABC {
   track;
@@ -107,11 +119,15 @@ class ABC {
       .set( 'answer', this.question.answer )
       .update( () => {
         this.track = { success: 'Update success!' };
-      },e=>{
-        this.track = { error: 'Update error...'};
+      },e =>{
+        this.track = { error: e };
       })
   }
 }
+
+````
+
+
 
 
 * How to put CSS
@@ -133,5 +149,40 @@ class ABC {
 
 ````
 
+### File upload
+
+
+* on Template
+
+````
+
+      <ion-item>
+        <div>
+          <img *ngIf=" urlPhoto " [src]="urlPhoto">
+        </div>
+        <input type="file" (change)="onFileChange($event)">
+        <div>
+          <progress [value]="position" max="100"></progress>
+        </div>
+      </ion-item>
+
+````
+
+
+* on class
+
+````
+
+    onFileChange(event) {
+        this.data.upload( event.target.files[0], url => {
+            this.urlPhoto = url;
+        },
+        e => alert(e),
+        percent => {
+            this.position = percent;
+        } );
+    }
+
+````
 
 

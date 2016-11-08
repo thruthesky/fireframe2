@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { SampleHomePage } from '../home/home';
 import { User, USER_DATA } from '../../user';
+import { Data } from '../../data';
+
 
 export interface DATA extends USER_DATA {
     name: string;
@@ -13,25 +15,20 @@ export interface DATA extends USER_DATA {
     templateUrl: 'register.html'
 })
 export class RegisterPage {
-    data = <DATA> {};
+    userData = <DATA> {};
     loginData: USER_DATA = null;
     result = null;
     progress = null;
     error = null;
+    position = 0;
+    urlPhoto;
 
     constructor( 
         public navCtrl: NavController,
-        public user: User
+        public user: User,
+        private data: Data
     ) {
         this.checkLogin();
-        /*
-        let id = 'user24';
-        this.data.email = id + '@naver.com';
-        this.data.password = id;
-        this.data.name = "Name: " + id;
-        this.data.mobile = "Mobile: " + id;
-        this.data.address = "Adderss: " + id;
-        */
     }
     checkLogin() {
         this.user.loggedIn( u => {
@@ -48,9 +45,9 @@ export class RegisterPage {
             .set('key', this.loginData.uid)
             .get( (user) => {
             console.log('user: ', user);
-            this.data.name = "Name: " + user.name;
-            this.data.mobile = "Mobile: " + user.mobile;
-            this.data.address = "Adderss: " + user.address;
+            this.userData.name = user.name;
+            this.userData.mobile = user.mobile;
+            this.userData.address = user.address;
         }, e => {
             alert( e );
         });
@@ -72,16 +69,16 @@ export class RegisterPage {
     }
     onClickRegister() {
         this.setProgress('Registraion is on going...')
-        this.user.sets(this.data).register( () => {
+        this.user.sets(this.userData).register( () => {
            this.setResult('User registration success.');
            this.checkLogin();
         }, e => this.setError( e ) );
     }
     onClickUpdate() {
-        console.log('RegisterPage::onClickUpdate() : ', this.data);
+        console.log('RegisterPage::onClickUpdate() : ', this.userData);
         this.setProgress('Updating ...');
         this.user
-            .sets( this.data )
+            .sets( this.userData )
             .set( 'key', this.loginData.uid )
             .update( () => {
                 this.setResult('User update success.');
@@ -93,5 +90,14 @@ export class RegisterPage {
     }
     onClickHome() {
         this.navCtrl.setRoot( SampleHomePage );
+    }
+    onFileChange(event) {
+        this.data.upload( event.target.files[0], url => {
+            this.urlPhoto = url;
+        },
+        e => alert(e),
+        percent => {
+            this.position = percent;
+        } );
     }
 }
