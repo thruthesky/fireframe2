@@ -9,6 +9,8 @@ export interface DATA extends USER_DATA {
     name: string;
     mobile: string;
     address: string;
+    urlPhoto?: string;
+    refPhoto?: string;
 }
 
 @Component({
@@ -20,6 +22,7 @@ export class RegisterPage {
     result = null;
     progress = null;
     error = null;
+    file_progress = null;
     position = 0;
     urlPhoto;
 
@@ -43,11 +46,14 @@ export class RegisterPage {
         console.log("RegisterPage::loadUser()", this.loginData);
         this.user
             .set('key', this.loginData.uid)
-            .get( (user) => {
+            .get( (user:DATA) => {
             console.log('user: ', user);
             this.userData.name = user.name;
             this.userData.mobile = user.mobile;
             this.userData.address = user.address;
+            this.userData.urlPhoto = user.urlPhoto;
+            this.userData.refPhoto = user.refPhoto;
+            this.urlPhoto = user.urlPhoto;
         }, e => {
             alert( e );
         });
@@ -91,13 +97,32 @@ export class RegisterPage {
     onClickHome() {
         this.navCtrl.setRoot( SampleHomePage );
     }
-    onFileChange(event) {
-        this.data.upload( event.target.files[0], url => {
-            this.urlPhoto = url;
+    onChangeFile(event) {
+        let file = event.target.files[0];
+        if ( file === void 0 ) return;
+        this.file_progress = true;
+        let ref = 'user-primary-photo/' + Date.now() + '/' + file.name;
+        this.data.upload( { file: file, ref: ref }, uploaded => {
+            this.file_progress = false;
+            this.urlPhoto = uploaded.url;
+            this.userData.urlPhoto = uploaded.url;
+            this.userData.refPhoto = uploaded.ref;
         },
-        e => alert(e),
+        e => {
+            this.file_progress = false;
+            alert(e);
+        },
         percent => {
             this.position = percent;
+        } );
+    }
+    onClickDeletePhoto() {
+        this.data.delete( this.userData.refPhoto, () => {
+            this.urlPhoto = null;
+            this.userData.urlPhoto = null;
+            this.userData.refPhoto = null;
+        }, e => {
+            alert("FILE DELETE ERROR: " + e);
         } );
     }
 }
