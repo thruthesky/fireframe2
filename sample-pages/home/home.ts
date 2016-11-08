@@ -19,7 +19,7 @@ export class SampleHomePage {
       private user: User,
       private userTest: UserTest ) {
 //    this.navCtrl.setRoot(LoginPage);
-     this.navCtrl.setRoot(RegisterPage);
+//     this.navCtrl.setRoot(RegisterPage);
       //this.navCtrl.setRoot(ResignPage);
 
 //    this.userTest.test( () => {} );

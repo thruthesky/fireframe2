@@ -51,6 +51,7 @@ export class FireframeBase {
      */
     create( successCallback: () => void, failureCallback: (e: string) => void ) {
         console.log('FireframeBase::create() data: ', this.data);
+        this.data = _.omitBy( this.data, _.isEmpty );
 
         let data = _.cloneDeep(this.data);
         this.clear();
@@ -128,8 +129,9 @@ export class FireframeBase {
      */
     update( successCallback: () => void, failureCallback: (e: string) => void ) {
 
-        console.log("FireframeBase::update() : this.data : ", this.data);
         if ( _.isEmpty( this.data )) return failureCallback('data is empty');
+        this.data = _.omitBy( this.data, v => v === void 0 );
+        console.log("FireframeBase::update() : this.data : ", JSON.stringify(this.data));
 
         let data = _.cloneDeep(this.data);
 
