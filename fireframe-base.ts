@@ -17,6 +17,9 @@ export class FireframeBase {
     private object: FirebaseObjectObservable<any>;
     private list: FirebaseListObservable<any>;
     data: any = {};
+
+
+    private pagination_key: string = '';
     constructor( fireframe ) {
         this.f = fireframe;
         this.af = this.f.af;
@@ -30,7 +33,7 @@ export class FireframeBase {
         this.list = this.af.database.list('/' + path);
         this.object = this.af.database.object('/' + path);
     }
-    set( key:string, value:string) : FireframeBase {
+    set( key:string, value:string|number) : FireframeBase {
         this.data[ key ] = value;
         return this;
     }
@@ -117,16 +120,50 @@ export class FireframeBase {
         }, failureCallback );
     }
 
-    /**
-     * Returns requested data in the path
-     */
-    fetch( successCallback, failureCallback ) {
-      let ref = this.object.$ref;
-      ref.orderByKey()
-        .limitToLast(10)
-        .on("child_added", (snapshot) => {
-        successCallback( snapshot.val() );
-      }, failureCallback );
+/**
+ * 
+ * Gets posts of next page.
+ * 
+ * 
+ * @param this.data['numberOfPosts'] is optional. default is 10.
+ * 
+ * @code
+ * 
+      this.post
+        .set('numberOfPosts', 40)
+        .nextPage( data => {
+          if ( infinite ) infinite.complete();
+          if ( ! _.isEmpty(data) ) this.displayPosts( data );
+          else {
+            this.noMorePost = true;
+            infinite.enable( false );
+          }
+        },
+        e => {
+          if ( infinite ) infinite.complete();
+          console.log("fetch failed: ", e);
+        });
+ * @endcode
+ */
+    nextPage( successCallback, failureCallback ) {
+        let num = ( this.data['numberOfPosts'] ? this.data['numberOfPosts'] : 10 ) + 1;
+        let ref = this.object.$ref;
+        let order = ref.orderByKey();
+        let q;
+        if ( this.pagination_key ) {
+            q = order.endAt( this.pagination_key ).limitToLast( num );
+        }
+        else {
+            q = order.limitToLast(num); 
+        }
+        q
+            .once('value', snapshot => {
+            let data = snapshot.val();
+            this.pagination_key = Object.keys( data ).shift();
+            let newData = _.omit( data, this.pagination_key );
+            successCallback( newData );
+        },
+        failureCallback );
     }
 
     count( successCallback, failureCallback? ) {
@@ -164,7 +201,7 @@ export class FireframeBase {
     }
 
     // delete
-    delete(successCallback, failureCallback ) {    
+    delete(successCallback, failureCallback ) {
         if ( ! this.isValidKey(this.data.key) ) return failureCallback('invalid key');
         this.get( re => {
             if ( re == null ) return failureCallback( 'key does not exist' );
