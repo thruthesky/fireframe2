@@ -124,6 +124,24 @@ export class FireframeBase {
       let ref = this.object.$ref;
       //let ref = this.list.$ref;
 
+
+      /**
+       *
+       * is it posible to do something like
+       *
+       * @startCode
+       *
+       * let ref = this.object.$ref;
+       * ref.orderByKey();
+       * ref.endAt( this.data.lastKey );
+       * ref.limitToLast( parseInt(this.data.limitToLast) )
+       * ref.once('value', (snapshot) => {
+       *  successCallback( snapshot.val() );
+       *  }, failureCallback );
+       *  @endCode
+       */
+
+
       if(this.data.lastKey != '' && (typeof this.data.limitToLast !== void 0)) {
         console.log('lastkey not empty', this.data.lastKey);
         console.log('limitToLast not empty', this.data.limitToLast);
