@@ -153,7 +153,7 @@ export class FireframeBase {
       else {
         console.log('default fetch');
         ref.orderByKey()
-          .limitToLast( 11 )
+          .limitToLast( 10 )
           .once('value', (snapshot) => {
             successCallback( snapshot.val() );
           }, failureCallback );
