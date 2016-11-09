@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { Platform, NavController, AlertController } from 'ionic-angular';
 import { SampleHomePage } from '../home/home';
 import { User, USER_DATA } from '../../user';
-import { Data } from '../../data';
+import { Data, FILE_UPLOAD } from '../../data';
+import { Camera } from 'ionic-native';
+
 
 
 export interface DATA extends USER_DATA {
@@ -12,6 +14,7 @@ export interface DATA extends USER_DATA {
     urlPhoto?: string;
     refPhoto?: string;
 }
+
 
 @Component({
     templateUrl: 'register.html'
@@ -24,14 +27,22 @@ export class RegisterPage {
     error = null;
     file_progress = null;
     position = 0;
-    urlPhoto;
+    defaultPhoto: string = "assets/images/anonymous.gif";
+    urlPhoto: string = this.defaultPhoto;
+    cordova: boolean = false;
 
     constructor( 
+        private platform: Platform,
+        private alertCtrl: AlertController,
         public navCtrl: NavController,
         public user: User,
         private data: Data
     ) {
         this.checkLogin();
+
+        platform.ready().then( () => {
+            if ( platform.is('cordova') ) this.cordova = true;
+        });
     }
     checkLogin() {
         this.user.loggedIn( u => {
@@ -51,9 +62,9 @@ export class RegisterPage {
             this.userData.name = user.name;
             this.userData.mobile = user.mobile;
             this.userData.address = user.address;
-            this.userData.urlPhoto = user.urlPhoto;
-            this.userData.refPhoto = user.refPhoto;
-            this.urlPhoto = user.urlPhoto;
+            this.userData.refPhoto = user.refPhoto || null;
+            this.userData.urlPhoto = user.urlPhoto || null;
+            this.urlPhoto = user.urlPhoto || this.defaultPhoto;
         }, e => {
             alert( e );
         });
@@ -81,7 +92,7 @@ export class RegisterPage {
         }, e => this.setError( e ) );
     }
     onClickUpdate() {
-        console.log('RegisterPage::onClickUpdate() : ', this.userData);
+        console.log('RegisterPage::onClickUpdate() : ', JSON.stringify(this.userData));
         this.setProgress('Updating ...');
         this.user
             .sets( this.userData )
@@ -97,16 +108,19 @@ export class RegisterPage {
     onClickHome() {
         this.navCtrl.setRoot( SampleHomePage );
     }
+    onFileUploaded( url, ref ) {
+        this.file_progress = false;
+        this.urlPhoto = url;
+        this.userData.urlPhoto = url;
+        this.userData.refPhoto = ref;
+    }
     onChangeFile(event) {
         let file = event.target.files[0];
         if ( file === void 0 ) return;
         this.file_progress = true;
         let ref = 'user-primary-photo/' + Date.now() + '/' + file.name;
         this.data.upload( { file: file, ref: ref }, uploaded => {
-            this.file_progress = false;
-            this.urlPhoto = uploaded.url;
-            this.userData.urlPhoto = uploaded.url;
-            this.userData.refPhoto = uploaded.ref;
+            this.onFileUploaded( uploaded.url, uploaded.ref );
         },
         e => {
             this.file_progress = false;
@@ -121,8 +135,76 @@ export class RegisterPage {
             this.urlPhoto = null;
             this.userData.urlPhoto = null;
             this.userData.refPhoto = null;
+            console.log('onClickDeletePhoto() : ', JSON.stringify(this.userData));
         }, e => {
             alert("FILE DELETE ERROR: " + e);
         } );
     }
+  onClickLogout() {
+    this.user.logout( () => this.checkLogin() );
+  }
+  onClickPhoto() {
+      if ( ! this.cordova ) return;
+      console.log('onClickPhoto()');
+    let confirm = this.alertCtrl.create({
+      title: 'PHOTO UPLOAD',
+      message: 'Do you want to take photo? or choose photo from gallery?',
+      cssClass: 'alert-camera-selection',
+      buttons: [
+        {
+          text: 'Camera',
+          handler: () => this.cameraTakePhoto( Camera.PictureSourceType.CAMERA )
+        },
+        {
+          text: 'Gallery',
+          handler: () => this.cameraTakePhoto( Camera.PictureSourceType.PHOTOLIBRARY )
+        },
+        {
+          text: 'Cancel',
+          handler: () => {
+            console.log('cancel clicked');
+          }
+        }
+      ]
+    });
+    confirm.present();
+  }
+
+  cameraTakePhoto( type: number ) {
+      console.log('cameraTakePhoto()');
+    let options = {
+        destinationType: Camera.DestinationType.DATA_URL,
+        sourceType: type,
+        encodingType: Camera.EncodingType.JPEG,
+        quality: 100
+    };
+
+    Camera.getPicture(options).then((imageData) => {
+        this.file_progress = true;
+        let ref = 'user-primary-photo/' + Date.now() + '/' + 'primary-photo.jpg';
+        let data : FILE_UPLOAD = {
+            file : {
+                name: 'primary-photo.jpg',
+                type: 'image/jpeg'
+            },
+            ref: ref,
+            base64: imageData
+        }
+        this.data.upload( data, uploaded => {
+            this.onFileUploaded( uploaded.url, uploaded.ref );
+        },
+        e => {
+            this.file_progress = true;
+            alert( e );
+        },
+        percent => {
+
+        } );
+    }, (err) => { alert(err); });
+
+  }
+
+
+
+
 }

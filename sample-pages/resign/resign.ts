@@ -7,6 +7,7 @@ import { User } from '../../user';
   templateUrl: 'resign.html'
 })
 export class ResignPage {
+    login;
     constructor( private navCtrl: NavController, private user: User ) {
 
     }

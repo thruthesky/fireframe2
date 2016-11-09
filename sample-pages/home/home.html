@@ -6,6 +6,7 @@
   </ion-navbar>
 </ion-header>
 
+
 <ion-content padding>
   <section *ngIf=" login ">
     <div warning>
@@ -20,4 +21,11 @@
     <button ion-button (click)="onClickLogin()">LOGIN</button>
     <button ion-button (click)="onClickRegister()">REGISTER</button>
   </section>
+
+
+
+    <button ion-button (click)="onClickLogin()">Category</button>
+    <button ion-button (click)="onClickRegister()">All Posts</button>
+    <button ion-button (click)="onClickRegister()">Search Posts</button>
+
 </ion-content>
