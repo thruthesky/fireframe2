@@ -16,7 +16,7 @@ fireframe version 2
 # install
 
 npm install firebase angularfire2 --save
-npm install lodash --save
+npm install @types/lodash --save
 
 
 

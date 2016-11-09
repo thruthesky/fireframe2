@@ -119,91 +119,50 @@ export class FireframeBase {
         }, failureCallback );
     }
 
-nextPage( successCallback, failureCallback ) {
-    let num = this.data['numberOfPosts'];
-    let ref = this.object.$ref;
-    console.log('pagination_key: ' + this.pagination_key);
-    let order = ref.orderByKey();
-    let q;
-    if ( this.pagination_key ) {
-        q = order.endAt( this.pagination_key ).limitToLast( num );
-    }
-    else {
-        q = order.limitToLast(num); 
-    }
-    q
-        .once('value', snapshot => {
-        let data = snapshot.val();
-        console.log('fetch 2: once: snapshot: ', snapshot.val() );
-        console.log('keys: ', Object.keys( data ) );
-        this.pagination_key = Object.keys( data ).shift();
-        successCallback( data );
-    },
-    failureCallback );
-}
-    /**
-     * Returns requested data in the path
-     *
-     */
-    fetch( successCallback, failureCallback ) {
-      let ref = this.object.$ref;
-      //let ref = this.list.$ref;
-
-
-      /**
-       *
-       * is it posible to do something like
-       *
-       * @startCode
-       *
-       * let ref = this.object.$ref;
-       * ref.orderByKey();
-       * ref.endAt( this.data.lastKey );
-       * ref.limitToLast( parseInt(this.data.limitToLast) )
-       * ref.once('value', (snapshot) => {
-       *  successCallback( snapshot.val() );
-       *  }, failureCallback );
-       *  @endCode
-       */
-
-
-      if(this.data.lastKey != '' && (typeof this.data.limitToLast !== void 0)) {
-        console.log('lastkey not empty', this.data.lastKey);
-        console.log('limitToLast not empty', this.data.limitToLast);
-        ref.orderByKey()
-          .endAt( this.data.lastKey )
-          .limitToLast( parseInt(this.data.limitToLast) )
-          .once('value', (snapshot) => {
-            successCallback( snapshot.val() );
-          }, failureCallback );
-      }
-      else if(typeof this.data.limitToLast !== void 0) {
-        console.log('limitToLast was provided', this.data.limitToLast);;
-        ref.orderByKey()
-          .limitToLast( parseInt(this.data.limitToLast) )
-          .once('value', (snapshot) => {
-            successCallback( snapshot.val() );
-          }, failureCallback );
-      }
-      else if(this.data.lastKey != '') {
-        console.log('lastKey was provided', this.data.lastKey);;
-        ref.orderByKey()
-          .endAt( this.data.lastKey )
-          .limitToLast( 10 )
-          .once('value', (snapshot) => {
-            successCallback( snapshot.val() );
-          }, failureCallback );
-      }
-      else {
-        console.log('default fetch');
-        ref.orderByKey()
-          .limitToLast( 10 )
-          .once('value', (snapshot) => {
-            successCallback( snapshot.val() );
-          }, failureCallback );
-      }
-
-
+/**
+ * 
+ * Gets posts of next page.
+ * 
+ * 
+ * @param this.data['numberOfPosts'] is optional. default is 10.
+ * 
+ * @code
+ * 
+      this.post
+        .set('numberOfPosts', 40)
+        .nextPage( data => {
+          if ( infinite ) infinite.complete();
+          if ( ! _.isEmpty(data) ) this.displayPosts( data );
+          else {
+            this.noMorePost = true;
+            infinite.enable( false );
+          }
+        },
+        e => {
+          if ( infinite ) infinite.complete();
+          console.log("fetch failed: ", e);
+        });
+ * @endcode
+ */
+    nextPage( successCallback, failureCallback ) {
+        let num = ( this.data['numberOfPosts'] ? this.data['numberOfPosts'] : 10 ) + 1;
+        let ref = this.object.$ref;
+        let order = ref.orderByKey();
+        let q;
+        if ( this.pagination_key ) {
+            q = order.endAt( this.pagination_key ).limitToLast( num );
+        }
+        else {
+            q = order.limitToLast(num); 
+        }
+        q
+            .once('value', snapshot => {
+            let data = snapshot.val();
+            this.pagination_key = Object.keys( data ).shift();
+            let newData = _.omit( data, this.pagination_key );
+            successCallback( newData );
+        },
+        failureCallback );
     }
 
     count( successCallback, failureCallback? ) {
