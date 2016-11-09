@@ -121,11 +121,45 @@ export class FireframeBase {
      */
     fetch( successCallback, failureCallback ) {
       let ref = this.object.$ref;
-      ref.orderByKey()
-        .limitToLast(10)
-        .on("child_added", (snapshot) => {
-        successCallback( snapshot.val() );
-      }, failureCallback );
+      //let ref = this.list.$ref;
+
+      if(this.data.lastKey != '' && (typeof this.data.limitToLast !== void 0)) {
+        console.log('lastkey not empty', this.data.lastKey);
+        console.log('limitToLast not empty', this.data.limitToLast);
+        ref.orderByKey()
+          .endAt( this.data.lastKey )
+          .limitToLast( parseInt(this.data.limitToLast) )
+          .once('value', (snapshot) => {
+            successCallback( snapshot.val() );
+          }, failureCallback );
+      }
+      else if(typeof this.data.limitToLast !== void 0) {
+        console.log('limitToLast was provided', this.data.limitToLast);;
+        ref.orderByKey()
+          .limitToLast( parseInt(this.data.limitToLast) )
+          .once('value', (snapshot) => {
+            successCallback( snapshot.val() );
+          }, failureCallback );
+      }
+      else if(this.data.lastKey != '') {
+        console.log('lastKey was provided', this.data.lastKey);;
+        ref.orderByKey()
+          .endAt( this.data.lastKey )
+          .limitToLast( 11 )
+          .once('value', (snapshot) => {
+            successCallback( snapshot.val() );
+          }, failureCallback );
+      }
+      else {
+        console.log('default fetch');
+        ref.orderByKey()
+          .limitToLast( 11 )
+          .once('value', (snapshot) => {
+            successCallback( snapshot.val() );
+          }, failureCallback );
+      }
+
+
     }
 
     count( successCallback, failureCallback? ) {
@@ -162,7 +196,7 @@ export class FireframeBase {
     }
 
     // delete
-    delete(successCallback, failureCallback ) {    
+    delete(successCallback, failureCallback ) {
         if ( ! this.isValidKey(this.data.key) ) return failureCallback('invalid key');
         this.get( re => {
             if ( re == null ) return failureCallback( 'key does not exist' );
