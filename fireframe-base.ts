@@ -17,6 +17,9 @@ export class FireframeBase {
     private object: FirebaseObjectObservable<any>;
     private list: FirebaseListObservable<any>;
     data: any = {};
+
+
+    private pagination_key: string = '';
     constructor( fireframe ) {
         this.f = fireframe;
         this.af = this.f.af;
@@ -30,7 +33,7 @@ export class FireframeBase {
         this.list = this.af.database.list('/' + path);
         this.object = this.af.database.object('/' + path);
     }
-    set( key:string, value:string) : FireframeBase {
+    set( key:string, value:string|number) : FireframeBase {
         this.data[ key ] = value;
         return this;
     }
@@ -116,6 +119,28 @@ export class FireframeBase {
         }, failureCallback );
     }
 
+nextPage( successCallback, failureCallback ) {
+    let num = this.data['numberOfPosts'];
+    let ref = this.object.$ref;
+    console.log('pagination_key: ' + this.pagination_key);
+    let order = ref.orderByKey();
+    let q;
+    if ( this.pagination_key ) {
+        q = order.endAt( this.pagination_key ).limitToLast( num );
+    }
+    else {
+        q = order.limitToLast(num); 
+    }
+    q
+        .once('value', snapshot => {
+        let data = snapshot.val();
+        console.log('fetch 2: once: snapshot: ', snapshot.val() );
+        console.log('keys: ', Object.keys( data ) );
+        this.pagination_key = Object.keys( data ).shift();
+        successCallback( data );
+    },
+    failureCallback );
+}
     /**
      * Returns requested data in the path
      *
