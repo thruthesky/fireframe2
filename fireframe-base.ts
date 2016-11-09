@@ -145,7 +145,7 @@ export class FireframeBase {
         console.log('lastKey was provided', this.data.lastKey);;
         ref.orderByKey()
           .endAt( this.data.lastKey )
-          .limitToLast( 11 )
+          .limitToLast( 10 )
           .once('value', (snapshot) => {
             successCallback( snapshot.val() );
           }, failureCallback );
