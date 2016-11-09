@@ -118,6 +118,7 @@ export class FireframeBase {
 
     /**
      * Returns requested data in the path
+     *
      */
     fetch( successCallback, failureCallback ) {
       let ref = this.object.$ref;
