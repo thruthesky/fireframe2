@@ -18,7 +18,6 @@ fireframe version 2
 
 npm install firebase angularfire2 --save
 npm install @types/lodash --save
-ionic plugin add cordova-plugin-file
 ionic plugin add cordova-plugin-camera ; for camera
 
 copy src/fireframe2/images assets
