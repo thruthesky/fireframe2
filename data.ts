@@ -1,11 +1,11 @@
 //  constructor(@Inject(FirebaseApp) firebaseApp: any) {
 import { Inject, Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
-interface FILE_UPLOAD {
+export interface FILE_UPLOAD {
   file: any;
   ref?: string;
 }
-interface FILE_UPLOADED {
+export interface FILE_UPLOADED {
   url: string;
   ref: string;
 }
