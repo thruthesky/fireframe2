@@ -160,8 +160,11 @@ export class FireframeBase {
     q
       .once('value', snapshot => {
           let data = snapshot.val();
-          this.pagination_key = Object.keys( data ).shift();
-          newData = (data) ? _.omit( data, this.pagination_key ) : null;
+          console.info('data: ', data);
+          newData = _.omit( data, this.pagination_key );
+          let last_key = Object.keys( data ).shift(); //added by charles
+          if(this.pagination_key == last_key ) newData = null; //added by charles
+          this.pagination_key = last_key;  //this.pagination_key = Object.keys( data ).shift();
           successCallback( newData );
         },
         failureCallback );
