@@ -162,7 +162,7 @@ export class FireframeBase {
           let data = snapshot.val();
           this.pagination_key = Object.keys( data ).shift();
           newData = (data) ? _.omit( data, this.pagination_key ) : null;
-          successCallback( this.newData );
+          successCallback( newData );
         },
         failureCallback );
   }
