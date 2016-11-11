@@ -150,7 +150,6 @@ export class FireframeBase {
     let ref = this.object.$ref;
     let order = ref.orderByKey();
     let q;
-    let newData;
     if ( this.pagination_key ) {
       q = order.endAt( this.pagination_key ).limitToLast( num );
     }
@@ -160,11 +159,8 @@ export class FireframeBase {
     q
       .once('value', snapshot => {
           let data = snapshot.val();
-          console.info('data: ', data);
-          newData = _.omit( data, this.pagination_key );
-          let last_key = Object.keys( data ).shift(); //added by charles
-          if(this.pagination_key == last_key ) newData = null; //added by charles
-          this.pagination_key = last_key;  //this.pagination_key = Object.keys( data ).shift();
+          this.pagination_key = Object.keys( data ).shift();
+          let newData = _.omit( data, this.pagination_key );
           successCallback( newData );
         },
         failureCallback );
