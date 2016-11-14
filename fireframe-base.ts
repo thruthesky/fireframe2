@@ -19,7 +19,8 @@ export class FireframeBase {
   data: any = {};
 
 
-  public pagination_key: string = '';
+  private pagination_key: string = '';      // pagination key
+  private pagination_last_page: boolean = false; // become true when last page has extracted.
   constructor( fireframe ) {
     this.f = fireframe;
     this.af = this.f.af;
@@ -129,20 +130,25 @@ export class FireframeBase {
    *
    * @code
    *
-   this.post
-   .set('numberOfPosts', 40)
-   .nextPage( data => {
-          if ( infinite ) infinite.complete();
-          if ( ! _.isEmpty(data) ) this.displayPosts( data );
-          else {
-            this.noMorePost = true;
-            infinite.enable( false );
-          }
-        },
-   e => {
-          if ( infinite ) infinite.complete();
-          console.log("fetch failed: ", e);
-        });
+        this.post.resetPagination();  // put it in constructor
+
+        loadPosts( infinite? ) {      // put this block inside infinite scroll
+            this.post
+              .set('numberOfPosts', 40)
+              .nextPage( data => {
+                console.log('loadPoss: ', data);
+                if ( infinite ) infinite.complete();
+                this.displayPosts( data );
+                if ( this.post.isLastPage() ) {
+                  this.noMorePost = true;
+                  infinite.enable( false );
+                }
+              },
+              e => {
+                if ( infinite ) infinite.complete();
+                console.log("fetch failed: ", e);
+              });
+        }
    * @endcode
    */
   nextPage( successCallback, failureCallback ) {
@@ -156,14 +162,29 @@ export class FireframeBase {
     else {
       q = order.limitToLast(num);
     }
+    
     q
       .once('value', snapshot => {
           let data = snapshot.val();
-          this.pagination_key = Object.keys( data ).shift();
-          let newData = _.omit( data, this.pagination_key );
+          let keys = Object.keys( data );
+          let newData;
+          if ( keys.length < this.data['numberOfPosts'] + 1 ) {
+            newData = data;
+            this.pagination_last_page = true;
+          }
+          else {
+            this.pagination_key = Object.keys( data ).shift();
+            newData = _.omit( data, this.pagination_key );
+          }
           successCallback( newData );
         },
         failureCallback );
+  }
+  isLastPage() {
+    return this.pagination_last_page;
+  }
+  resetPagination() {
+    this.pagination_key = '';
   }
 
   count( successCallback, failureCallback? ) {
