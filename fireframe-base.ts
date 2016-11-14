@@ -162,7 +162,7 @@ export class FireframeBase {
     else {
       q = order.limitToLast(num);
     }
-    
+
     q
       .once('value', snapshot => {
           let data = snapshot.val();
@@ -193,8 +193,20 @@ export class FireframeBase {
   search(successCallback, failureCallback? ) {
     let num = ( this.data['numberOfPosts'] ? this.data['numberOfPosts'] : 10 ) + 1;
     let ref = this.object.$ref;
-    ref
-      .limitToLast( num )
+    let q;
+    if(this.data.gender) {
+      q = ref.orderByChild('gender').equalTo(this.data.gender);
+    }
+    else {
+      q = ref;
+    }
+
+
+    q
+      //.orderByChild('birthday')
+      //.startAt(this.data.maxAge)
+      //.endAt(this.data.minAge)
+      .limitToFirst(num)
       .once('value', snapshot => {
       successCallback( snapshot.val() );
     }, failureCallback );
