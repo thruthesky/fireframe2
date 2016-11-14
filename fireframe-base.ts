@@ -166,6 +166,21 @@ export class FireframeBase {
         failureCallback );
   }
 
+  /**
+   *
+   */
+  search(successCallback, failureCallback? ) {
+    let num = ( this.data['numberOfPosts'] ? this.data['numberOfPosts'] : 10 ) + 1;
+    let ref = this.object.$ref;
+    ref
+      .limitToLast( num )
+      .once('value', snapshot => {
+      successCallback( snapshot.val() );
+    }, failureCallback );
+  }
+
+
+
   count( successCallback, failureCallback? ) {
     let ref = this.object.$ref;
     ref.once('value', snapshot => {
